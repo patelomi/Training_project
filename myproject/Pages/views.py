@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from Language.models import *
 from Pages.models import *
+from .forms import PagesForm
 # Create your views here.
 listdata=[]
 lan = Language.objects.all()
@@ -28,4 +29,9 @@ def page_details(request,slug):
     pagedetails = PageLanguage.objects.raw("select * from pages_pagelanguage where pages_id = '"+slug+"'")
 
     return render(request,'Pages/Home.html',{'contentdata':pagedetails,'pages':pages,"language":listdata,"datalist":request.session['data'],"language":language})
-    
+
+
+def change_form(request):
+    context ={}
+    context['form']= PagesForm()
+    return render(request, "admin\Pages\Pages\change_form.html", context)
