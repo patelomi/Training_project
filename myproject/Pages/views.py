@@ -27,11 +27,6 @@ def page_details(request,slug):
     contentdata = PageLanguage.objects.all().values()
     language = Language.objects.all().values()
     pagedetails = PageLanguage.objects.raw("select * from pages_pagelanguage where pages_id = '"+slug+"'")
+    print(pagedetails)
 
-    return render(request,'Pages/Home.html',{'contentdata':pagedetails,'pages':pages,"language":listdata,"datalist":request.session['data'],"language":language})
-
-
-def change_form(request):
-    context ={}
-    context['form']= PagesForm()
-    return render(request, "admin\Pages\Pages\change_form.html", context)
+    return render(request,'admin/Pages/Home.html',{'contentdata':pagedetails,'pages':pages,"language":listdata,"datalist":request.session['data'],"language":language})

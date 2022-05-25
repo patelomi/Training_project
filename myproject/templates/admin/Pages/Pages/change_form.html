@@ -11,7 +11,13 @@
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
 <style>
-  
+  .tabs{
+    background-color:var(--body-bg);
+  }
+ td,th{
+    color: white;
+  }
+
 </style>
 <script>
   $(function () {
@@ -25,6 +31,7 @@
 <body>
   <form action="#" method="post">
     {% csrf_token %}
+    {% if obj == None %}
     <table>
       <tr>
         <td>Slug</td>
@@ -36,28 +43,91 @@
       </tr>
       <tr>
         <td>Status</td>
-        <th><input type="radio" id="e" name="status" value="enable">
-          <label for="html">Enable</label><br>
-          <input type="radio" id="d" name="status" value="disable">
-          <label for="css">Disable</label><br>
+        <th>
+          <select name="status" id="status">
+            <option value="Enabled">Enabled</option>
+            <option value="Disabled">Disabled</option>
+          </select>
         </th>
       </tr>
-      <tr>
-        <th><input type="submit" /></th>
-      </tr>
-    </table><br>
-    <div id="tabs">
+    </table>
+    <br>
+    <div id="tabs" class="tabs">
       <ul>
         {% for i in lang_data %}
         <li><a href="#{{i.locale}}">{{i.title}}</a></li>
         {% endfor %}
       </ul>
-      {% for i in lang_data %}
+
       <div id="{{i.locale}}">
-        <p>{{i.title}}</p>
+        <p>
+          <table>
+            <tr>
+              <td>Title</td>
+              <th><input type="text" name="title" id="title" required></th>
+            </tr>
+            <tr>
+              <td>Content</td>
+              <th><textarea rows="4" cols="50" name="content" id="content" required></textarea></th>
+            </tr>
+          </table>
+        </p>
+        <input type="submit" />
       </div>
+      </div> 
+
+    {% else %}
+    {% for i in page_data %}
+    {% if obj == i.slug %}
+    <table>
+      <tr>
+        <td>Slug</td>
+        <th><input type="text" name="slug" id="slug" value="{{i.slug}}" required></th>
+      </tr>
+      <tr>
+        <td>Sort Order</td>
+        <th><input type="text" name="sortorder" id="sortorder" value="{{i.sortorder}}" required></th>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <th>
+          {{i.status}}
+        </th>
+      </tr>
+    </table>
+    {% endif %}
+    {% endfor %}
+    <br>
+    <div id="tabs" class="tabs">
+      <ul>
+        {% for i in lang_data %}
+        <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+        {% endfor %}
+      </ul>
+
+      {% for i in lang_data %}
+      {% for data in Pages_data %}
+      {% if i.title == data.language|stringformat:'s' %}
+      <div id="{{i.locale}}">
+        <p>
+          <table>
+            <tr>
+              <td>Title</td>
+              <th><input type="text" name="title" id="title" value="{{ data.title }}" required></th>
+            </tr>
+            <tr>
+              <td>Content</td>
+              <th><textarea rows="4" cols="50" name="content" id="content" required>{{ data.content }}</textarea></th>
+            </tr>
+          </table>
+        </p>
+        <input type="submit" />
+      </div>
+      {% endif %}
       {% endfor %}
-      </div>
+      {% endfor %}
+      {% endif %}
+      </div> 
   </form>
 </body>
 
