@@ -1,5 +1,6 @@
 import re
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from Pages.models import *
 from Language.models import *
@@ -53,6 +54,11 @@ class PagesAdmin(admin.ModelAdmin):
                     PageLanguagedata = PageLanguage(title = title, content = content, pages = pagesdata, language = langdata)
                     PageLanguagedata.save()
 
+                from django.contrib import messages
+                messages.success(request,('Add Successfully'))
+                    
+                return HttpResponseRedirect("/admin/Pages/pages/")
+
         else:
             Pages_data = (
                     PageLanguage.objects.raw("select * from pages_pagelanguage where pages_id = '"+obj+"'")
@@ -78,7 +84,19 @@ class PagesAdmin(admin.ModelAdmin):
 
                     PageLanguage.objects.filter(id=id).update(title = title, content = content, pages = pagesdata, language = langdata)
                     
-
+            listof_data = (
+                PageLanguage.objects.raw("select * from pages_pagelanguage as pl inner join pages_pages as p on pl.pages_id=p.slug inner join language_language as lan on pl.language_id = lan.locale where pl.pages_id = '"+obj+"'")
+            )
+            list_data={}
+            
+            for l in lang_data:
+                for i in listof_data:
+                    if l.locale == i.locale:
+                        list_data[l.locale]=i
+            print(list_data)
+                        
+            for i in lang_data:
+                print(list_data[i.locale].content)
 
         extra_context = extra_context or {"lang_data": lang_data,"Pages_data":Pages_data,"page_data":page_data,"obj":obj}
         return super().changeform_view(request, obj,form_url,extra_context=extra_context)
@@ -88,4 +106,4 @@ class PageLanguageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Pages,PagesAdmin)
-admin.site.register(PageLanguage)
+# admin.site.register(PageLanguage)
