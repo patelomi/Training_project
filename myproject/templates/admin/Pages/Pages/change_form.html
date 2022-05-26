@@ -11,13 +11,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
 <style>
-  .tabs{
-    background-color:var(--body-bg);
-  }
- td,th{
-    color: white;
+  .tabs {
+    background-color: var(--body-bg);
   }
 
+  td,
+  th {
+    color: white;
+  }
 </style>
 <script>
   $(function () {
@@ -29,8 +30,9 @@
 {% block content %}
 
 <body>
-  <form action="#" method="post">
+  <form method="post">
     {% csrf_token %}
+    
     {% if obj == None %}
     <table>
       <tr>
@@ -58,23 +60,31 @@
         <li><a href="#{{i.locale}}">{{i.title}}</a></li>
         {% endfor %}
       </ul>
-
+  
+      {% for i in lang_data %}
+      
       <div id="{{i.locale}}">
         <p>
-          <table>
-            <tr>
-              <td>Title</td>
-              <th><input type="text" name="title" id="title" required></th>
-            </tr>
-            <tr>
-              <td>Content</td>
-              <th><textarea rows="4" cols="50" name="content" id="content" required></textarea></th>
-            </tr>
-          </table>
+        <table>
+          <tr>
+            <td>Language</td>
+            <th><input type="text" name="{{i.locale}}language" id="{{i.locale}}language" value="{{i.locale}}" required></th>
+          </tr>
+          <tr>
+            <td>Title</td>
+            <th><input type="text" name="{{i.locale}}title" id="{{i.locale}}title"  required></th>
+          </tr>
+          <tr>
+            <td>Content</td>
+            <th><textarea rows="4" cols="50" name="{{i.locale}}content" id="{{i.locale}}content" required></textarea></th>
+          </tr>
+        </table>
         </p>
         <input type="submit" />
       </div>
-      </div> 
+      {% endfor %}
+    </div>
+  </form>
 
     {% else %}
     {% for i in page_data %}
@@ -110,16 +120,16 @@
       {% if i.title == data.language|stringformat:'s' %}
       <div id="{{i.locale}}">
         <p>
-          <table>
-            <tr>
-              <td>Title</td>
-              <th><input type="text" name="title" id="title" value="{{ data.title }}" required></th>
-            </tr>
-            <tr>
-              <td>Content</td>
-              <th><textarea rows="4" cols="50" name="content" id="content" required>{{ data.content }}</textarea></th>
-            </tr>
-          </table>
+        <table>
+          <tr>
+            <td>Title</td>
+            <th><input type="text" value="{{ data.title }}" required></th>
+          </tr>
+          <tr>
+            <td>Content</td>
+            <th><textarea rows="4" cols="50" required>{{ data.content }}</textarea></th>
+          </tr>
+        </table>
         </p>
         <input type="submit" />
       </div>
@@ -127,8 +137,7 @@
       {% endfor %}
       {% endfor %}
       {% endif %}
-      </div> 
-  </form>
+    </div>
 </body>
 
 <!-- {{ block.super }} -->
