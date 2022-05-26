@@ -58,6 +58,28 @@ class PagesAdmin(admin.ModelAdmin):
                     PageLanguage.objects.raw("select * from pages_pagelanguage where pages_id = '"+obj+"'")
                 )
 
+            if request.method == 'POST':
+                slug = request.POST['slug']
+                sortorder = request.POST['sortorder']
+                status = request.POST['status'] 
+
+                Pages.objects.filter(slug=slug).update(sortorder=sortorder,status=status)
+                
+
+                pagesdata = Pages.objects.get(slug = slug)
+
+
+                for i in lang_data: 
+                    id = request.POST.get(i.locale+'id')
+                    title = request.POST.get(i.locale+'title') 
+                    content = request.POST.get(i.locale+'content')
+                    lang = request.POST.get(i.locale+'language')
+                    langdata = Language.objects.get(locale = lang)
+
+                    PageLanguage.objects.filter(id=id).update(title = title, content = content, pages = pagesdata, language = langdata)
+                    
+
+
         extra_context = extra_context or {"lang_data": lang_data,"Pages_data":Pages_data,"page_data":page_data,"obj":obj}
         return super().changeform_view(request, obj,form_url,extra_context=extra_context)
 
