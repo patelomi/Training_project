@@ -86,8 +86,8 @@ class PagesAdmin(admin.ModelAdmin):
             listof_data = (
                 PageLanguage.objects.raw("select * from pages_pagelanguage as pl inner join pages_pages as p on pl.pages_id=p.slug inner join language_language as lan on pl.language_id = lan.locale where pl.pages_id = '"+obj+"'")
             )
+
             list_data={}
-            
             for l in lang_data:
                 for i in listof_data:
                     if l.locale == i.locale:
@@ -99,7 +99,7 @@ class PagesAdmin(admin.ModelAdmin):
                 list_data = {i.locale,i.title,i.slug,i.sortorder,i.language,i.pages,i.title,i.content}
                 print(list_data)  
 
-        extra_context = extra_context or {"lang_data": lang_data,"Pages_data":Pages_data,"page_data":page_data,"obj":obj,'list_data':list_data}
+        extra_context = extra_context or {"lang_data": lang_data,"Pages_data":Pages_data,"page_data":page_data,"obj":obj}
         return super().changeform_view(request, obj,form_url,extra_context=extra_context)
 
 class PageLanguageAdmin(admin.ModelAdmin):

@@ -1,0 +1,104 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+<!-- Override extrahead to add Chart.js -->
+{% block extrahead %}
+{{ block.super }}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Tabs - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+{% endblock %}
+{% block content %}
+
+<!-- Override jquery css -->
+<style>
+    .tabs {
+        background-color: var(--body-bg);
+    }
+
+    .tabs1 {
+        background-color: var(--body-bg);
+    }
+
+    td,
+    th {
+        color: white;
+    }
+</style>
+
+<!-- js for tab -->
+<script>
+    $(function () {
+        $(".tabs").tabs();
+    });
+</script>
+
+<body>
+    <form name="attributeform" id="attributeform" method="post">
+        {% csrf_token %}
+        <!-- empty attributeform -->
+        <div id="tabs" class="tabs">
+            <ul>
+                <li><a href="#Attribute">Attribute</a></li>
+                <li><a href="#Attributetranslation">Attribute Translation</a></li>
+            </ul>
+            <!-- Attribute tab  -->
+            <div id="Attribute">
+                <table>
+                    <tr>
+                        <td>Code</td>
+                        <th><input type="text" name="code" id="code" required></th>
+                    </tr>
+                    <tr>
+                        <td>Input Type</td>
+                        <th>
+                            <select name="status" id="status">
+                                <option disabled selected>------</option>
+                                <option value="Textbox">Textbox</option>
+                                <option value="Radio">Radio</option>
+                                <option value="Checkbox">Checkbox</option>
+                                <option value="Boolean">Boolean</option>
+                                <option value="Textarea">Textarea</option>
+                                <option value="Multi-select">Multi-select</option>
+                            </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>Is Request?</td>
+                        <th><input type="checkbox" name="isrequest" id="isrequest" required></th>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Attribute Translation tab -->
+            <div id="Attributetranslation">
+
+            </div>
+        </div>
+
+        <!-- disply/update attributeform -->
+        <!-- <div id="tabs" class="tabs">
+            <ul>
+              <li><a href="#Attribute">Attribute</a></li>
+              <li><a href="#Attributetranslation">Attribute Translation</a></li>
+            </ul> -->
+        <!-- Attribute tab  -->
+        <!-- <div id="Attribute">
+                
+            </div> -->
+
+        <!-- Attribute Translation tab -->
+        <!-- <div id="Attributetranslation">
+
+            </div>
+        </div> -->
+    </form>
+</body>
+
+{{ block.super }}
+{% endblock %}
