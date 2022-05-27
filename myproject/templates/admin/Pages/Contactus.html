@@ -11,6 +11,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <title>{{page.slug}}</title>
   <script>
+    // getting data from views
     let deflan = '{{datalist}}'
     data = deflan.split("&#x27;").join("")
     var selectedlan = data
@@ -30,6 +31,7 @@
 
         }
       }
+      // display in the pera
       {% for i in contentdata %}
 
       if ('{{i.language}}' == selectedlan) {
@@ -41,24 +43,26 @@
 
       {% endfor %}
 
+      // if language is change
       $("select.language").change(function () {
         selectedlan = $(this).children("option:selected").val();
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    console.log(csrftoken)
-    console.log("selected:"+selectedlan)
-    $.ajax({
-        type: 'POST',
-        headers: {'X-CSRFToken': csrftoken},
-        url: "",
-        data: {'lang': selectedlan}, 
-          
-        success: function (response) {
-          // location.reload();
-        },
-        cache: false,
-      });
+        console.log(csrftoken)
+        console.log("selected:" + selectedlan)
+        $.ajax({
+          type: 'POST',
+          headers: { 'X-CSRFToken': csrftoken },
+          url: "",
+          data: { 'lang': selectedlan },
+
+          success: function (response) {
+            // location.reload();
+          },
+          cache: false,
+        });
         console.log(selectedlan)
 
+        // displying the data
         {% for i in contentdata %}
 
 
@@ -79,6 +83,7 @@
 </head>
 
 <body>
+  <!-- Navigation  -->
   {% csrf_token %}
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -89,37 +94,21 @@
             <a class="nav-link" aria-current="page" href="/{{ data.slug }}">{{ data.slug }}</a>
           </li>
           {% endfor %}
-
-          <!-- <li class="nav-item">
-                <a class="nav-link" href="#">Features</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link ">Disabled</a>
-              </li> -->
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- {% for data in contentdata %}
- 
-  <p id="p">{{ data.content|safe }}</p>
-
-  {% endfor %} -->
-
+  <!-- body -->
   <p id="p"></p>
   <p id="o"></p>
 
+  <!-- Language list -->
   <select class="language" id="language">
     {% for data in language %}
     <option value="{{ data.title }}">{{ data.title }}</option>
     {% endfor %}
   </select>
 
-
 </body>
-
 </html>

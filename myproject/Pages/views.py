@@ -3,17 +3,23 @@ from Language.models import *
 from Pages.models import *
 from .forms import PagesForm
 # Create your views here.
+
 listdata=[]
+#getting data from language table
 lan = Language.objects.all()
 for i in lan:
     if i.isdefault == "Yes":
         languageid = i.title
 
+#filter via enabal
 def page_list():
     pages = Pages.objects.filter(status="Enabled").order_by('sortorder')
     return pages
 
+#geting slug into the database
 def page_details(request,slug):
+
+    #passing the language in session
     if request.method == 'POST':
         sessiondata = request.POST.get('lang')
         request.session['data'] = sessiondata

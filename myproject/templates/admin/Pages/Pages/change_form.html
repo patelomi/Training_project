@@ -3,6 +3,7 @@
 <!-- Override extrahead to add Chart.js -->
 {% block extrahead %}
 {{ block.super }}
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>jQuery UI Tabs - Default functionality</title>
@@ -10,6 +11,8 @@
 <link rel="stylesheet" href="/resources/demos/style.css">
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+<!-- Override jquery css -->
 <style>
   .tabs {
     background-color: var(--body-bg);
@@ -24,19 +27,35 @@
     color: white;
   }
 </style>
+
+<!-- js for tab -->
 <script>
   $(function () {
     $("#tabs").tabs();
     $("#tabs1").tabs();
   });
+  function validform() {
+    var title = document.getElementById('title').value;
+    var contentt = document.getElementById('contentt').value;
+    console.log(contentt);
+    if (title == "") {
+      alert("null")
+      return false;
+    }
+    else if (contentt == "") {
+      alert("connull")
+      return false;
+    }
+  }
 </script>
-{% endblock %}
 
+{% endblock %}
 {% block content %}
 
 <body>
-  <form method="post">
+  <form method="post" onsubmit="return validform()">
     {% csrf_token %}
+    <!-- add form data -->
     {% if obj == None %}
     <div id="tabs1" class="tabs1">
       <ul>
@@ -44,6 +63,7 @@
         <li><a href="#Language">Language</a></li>
       </ul>
 
+      <!-- Page table data add -->
       <div id="Pages">
         <table>
           <tr>
@@ -66,7 +86,6 @@
         </table>
         <br>
       </div>
-
       <div id="Language"><br>
         <div id="tabs" class="tabs">
           <ul>
@@ -74,34 +93,33 @@
             <li><a href="#{{i.locale}}">{{i.title}}</a></li>
             {% endfor %}
           </ul>
+
+          <!-- Translation table add -->
           {% for i in lang_data %}
           <div id="{{i.locale}}">
             <p>
             <table>
               <tr>
-                <!-- <td>Language</td> -->
                 <th><input type="hidden" name="{{i.locale}}language" id="{{i.locale}}language" value="{{i.locale}}"
                     required></th>
               </tr>
               <tr>
                 <td>Title</td>
-                <th><input type="text" name="{{i.locale}}title" id="{{i.locale}}title" required></th>
+                <th><input type="text" name="{{i.locale}}title" id="title"></th>
               </tr>
               <tr>
                 <td>Content</td>
-                <th><textarea rows="4" cols="50" name="{{i.locale}}content" id="{{i.locale}}content"
-                    required></textarea></th>
+                <th><input type="text" name="{{i.locale}}content" id="contentt"></th>
               </tr>
             </table>
             </p>
           </div>
           {% endfor %}
         </div>
-
         <br>
       </div>
 
-
+      <!-- disply/update form -->
       {% else %}
       {% for i in page_data %}
       {% if obj == i.slug %}
@@ -111,9 +129,9 @@
           <li><a href="#Pages">Pages</a></li>
           <li><a href="#Language">Language</a></li>
         </ul>
-
+        
+        <!-- Page table data disply/update -->
         <div id="Pages">
-
           <table>
             <tr>
               <td>Slug</td>
@@ -135,7 +153,6 @@
           {% endif %}
           {% endfor %}
         </div>
-
         <br>
         <div id="Language"><br>
           <div id="tabs" class="tabs">
@@ -145,6 +162,7 @@
               {% endfor %}
             </ul>
 
+            <!-- Translation table data disply/update -->
             {% for i in lang_data %}
             {% for data in Pages_data %}
             {% if i.title == data.language|stringformat:'s' %}
@@ -182,5 +200,4 @@
   </form>
 </body>
 
-<!-- {{ block.super }} -->
 {% endblock %}
