@@ -77,28 +77,59 @@
 
             <!-- Attribute Translation tab -->
             <div id="Attributetranslation">
+                <div id="tabs" class="tabs">
+                    <ul>
+                        {% for i in lang_data %}
+                        <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+                        {% endfor %}
+                    </ul>
 
-            </div>
-        </div>
+                    <!-- Translation table add -->
+                    {% for i in lang_data %}
+                    <div id="{{i.locale}}">
+                        <p>
+                        <table>
+                            <tr>
+                                <td>Language</td>
+                                <th><input type="text" name="language" id="language" required></th>
+                            </tr>
+                            <td>Attribute</td>
+                            <th>
+                                <select name="attribute" id="attribute">
+                                    <option disabled selected>------</option>
+                                    <option value="Textbox">Textbox</option>
+                                </select>
+                            </th>
+                            <tr>
+                                <td>Name</td>
+                                <th><input type="text" name="name" id="name" required></th>
+                            </tr>
+                        </table>
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div><br><br>
+            <input type="submit" />
 
-        <!-- disply/update attributeform -->
-        <!-- <div id="tabs" class="tabs">
+            <!-- disply/update attributeform -->
+            <!-- <div id="tabs" class="tabs">
             <ul>
               <li><a href="#Attribute">Attribute</a></li>
               <li><a href="#Attributetranslation">Attribute Translation</a></li>
             </ul> -->
-        <!-- Attribute tab  -->
-        <!-- <div id="Attribute">
+            <!-- Attribute tab  -->
+            <!-- <div id="Attribute">
                 
             </div> -->
 
-        <!-- Attribute Translation tab -->
-        <!-- <div id="Attributetranslation">
+            <!-- Attribute Translation tab -->
+            <!-- <div id="Attributetranslation">
 
             </div>
         </div> -->
     </form>
 </body>
 
-{{ block.super }}
+<!-- {{ block.super }} -->
 {% endblock %}
