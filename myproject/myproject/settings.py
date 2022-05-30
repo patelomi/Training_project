@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'Attribute',
     'AttributeTraslation',
     'Option',
-    'OptionAttribute'
+    'OptionTranslation',
 ]
 
 MIDDLEWARE = [
