@@ -36,23 +36,55 @@
     }
 </style>
 
+<script>
+    $(function () {
+        $("#tabs").tabs();
+    })
+    function GetSelectedTextValue(inputtype) {
+        var selectedText = inputtype.options[inputtype.selectedIndex].innerHTML;
+        var selectedValue = inputtype.value;
+        if (selectedValue == "Select") {
+            $("#Options").show()
+        }
+        else if (selectedValue == "Multi-select") {
+            $("#Options").show()
+        }
+        else if (selectedValue == "Radio") {
+            $("#Options").show()
+        }
+        else if (selectedValue == "Checkbox") {
+            $("#Options").show()
+        }
+        else (
+            $("#Options").hide()
+        )
+    }
+    function add() {
+        $("#optiontable").append(`<tr>{% for i in lang_data %}<input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"required><td><input type="text" name="{{i.locale}}name" id="{{i.locale}}name" required></td>{% endfor %}<td><input type="text" name="option" id="option" required></td><td><input type="text" name="sortorder" id="sortorder" required></td><td><input type="checkbox" name="isdefault" id="isdefault" required></td><td><input type="button" onclick="deletedata()" value="delete" style="background-color: #a41515;"></td></tr>`);
+    }
+    function deletedata() {
+        $(event.target).closest("tr").remove();
+    }
+</script>
+
 <body>
     <form name="attributeform" id="attributeform" method="post">
         {% csrf_token %}
         <!-- empty attributeform -->
         {% if obj == None %}
         <!-- Translation table add -->
-        <table>
-            {% for i in lang_data %}
-            <tr>
-                <td>Name [{{i.locale}}]</td>
-                <input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"
-                    required>
-                <th><input type="text" name="{{i.locale}}name" id="{{i.locale}}name" required></th>
-            </tr>
-            {% endfor %}
-        </table><br><br>
-        <div id="Attribute">
+
+        <div id="Attributes">
+            <table>
+                {% for i in lang_data %}
+                <tr>
+                    <td>Name [{{i.locale}}]</td>
+                    <input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"
+                        required>
+                    <th><input type="text" name="{{i.locale}}name" id="{{i.locale}}name" required></th>
+                </tr>
+                {% endfor %}
+            </table><br><br>
             <table>
                 <tr>
                     <td>Code</td>
@@ -61,7 +93,7 @@
                 <tr>
                     <td>Input Type</td>
                     <th>
-                        <select name="inputtype" id="inputtype">
+                        <select name="inputtype" id="inputtype" class="inputtype" onchange="GetSelectedTextValue(this)">
                             <option disabled selected>------</option>
                             <option value="Textbox">Textbox</option>
                             <option value="Radio">Radio</option>
@@ -69,39 +101,46 @@
                             <option value="Boolean">Boolean</option>
                             <option value="Textarea">Textarea</option>
                             <option value="Multi-select">Multi-select</option>
+                            <option value="Select">Select</option>
                         </select>
                     </th>
                 </tr>
                 <tr>
                     <td>Is Request?</td>
-                    <th><input type="checkbox" name="isrequest" id="isrequest" required></th>
+                    <th><input type="checkbox" name="isrequest" id="isrequest"></th>
+                </tr>
+            </table>
+        </div>
+        <br><br>
+        <div id="Options" class="Options" hidden>
+            <div class="breadcrumbs">
+                › Add Option  <input type="button" onclick="add()" value="Add" style="background-color: #006b1b;">
+            </div>
+            <br><br>
+            <table class="optiontable" id="optiontable">
+                <tr>
+                    {% for i in lang_data %}
+                    <th>Name [{{i.locale}}]</th>
+                    {% endfor %}
+                    <th>Custom Option</th>
+                    <th>Sort Order</th>
+                    <th>Default?</th>
+                    <th>Delete</th>
+                </tr>
+                <tr>
+                    {% for i in lang_data %}
+                    <input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"
+                        required>
+                    <td><input type="text" name="{{i.locale}}nameoption" id="{{i.locale}}nameoption" required></td>
+                    {% endfor %}
+                    <td><input type="text" name="option" id="option" required></td>
+                    <td><input type="text" name="sortorder" id="sortorder" required></td>
+                    <td><input type="checkbox" name="isdefault" id="isdefault"></td>
+                    <td><input type="button" onclick="deletedata()" value="delete" style="background-color: #a41515;">
+                    </td>
                 </tr>
             </table>
         </div><br><br>
-        <div class="breadcrumbs"></div>
-        <table>
-            {% for i in lang_data %}
-            <tr>
-                <td>Name [{{i.locale}}]</td>
-                <input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"
-                    required>
-                <th><input type="text" name="{{i.locale}}name" id="{{i.locale}}name" required></th>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td>Custom Option</td>
-                <th><input type="text" name="option" id="option" required></th>
-            </tr>
-            <tr>
-                <td>Sort Order</td>
-                <th><input type="text" name="sortorder" id="sortorder" required></th>
-            </tr>
-            <tr>
-                <td>Default?</td>
-                <th><input type="checkbox" name="isdefault" id="isdefault" required></th>
-            </tr>
-        </table><br><br>
-    </div>
         {% else %}
         <!-- disply/update attributeform -->
         <!-- Attribute Translation tab -->

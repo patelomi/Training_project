@@ -7,34 +7,7 @@
 {% endblock %}
 {% block content %}
 
-<body>
-    <form name="attributeform" id="attributeform" method="post">
-        {% csrf_token %}
-        <table>
-            {% for i in lang_data %}
-            <tr>
-                <td>Name [{{i.locale}}]</td>
-                <input type="hidden" value="{{i.locale}}" name="{{i.locale}}language" id="{{i.locale}}language"
-                    required>
-                <th><input type="text" name="{{i.locale}}name" id="{{i.locale}}name" required></th>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td>Custom Option</td>
-                <th><input type="text" name="option" id="option" required></th>
-            </tr>
-            <tr>
-                <td>Sort Order</td>
-                <th><input type="text" name="sortorder" id="sortorder" required></th>
-            </tr>
-            <tr>
-                <td>Default?</td>
-                <th><input type="checkbox" name="isdefault" id="isdefault" required></th>
-            </tr>
-        </table><br><br>
-        <input type="submit" />
-    </form>
-</body>
 
-<!-- {{ block.super }} -->
+
+{{ block.super }}
 {% endblock %}
