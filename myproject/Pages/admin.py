@@ -3,10 +3,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from Pages.models import *
 from Language.models import *
-from Pages.views import page_details
+# from Pages.views import page_details
 
 # Register your models here.
-
 
 class PageLanguageInline(admin.StackedInline):
     model = PageLanguage

@@ -1,0 +1,203 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+<!-- Override extrahead to add Chart.js -->
+{% block extrahead %}
+{{ block.super }}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Tabs - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+<!-- Override jquery css -->
+<style>
+  .tabs {
+    background-color: var(--body-bg);
+  }
+
+  .tabs1 {
+    background-color: var(--body-bg);
+  }
+
+  td,
+  th {
+    color: white;
+  }
+</style>
+
+<!-- js for tab -->
+<script>
+  $(function () {
+    $("#tabs").tabs();
+    $("#tabs1").tabs();
+  });
+  function validform() {
+    var title = document.getElementById('title').value;
+    var contentt = document.getElementById('contentt').value;
+    console.log(contentt);
+    if (title == "") {
+      alert("null")
+      return false;
+    }
+    else if (contentt == "") {
+      alert("connull")
+      return false;
+    }
+  }
+</script>
+
+{% endblock %}
+{% block content %}
+
+<body>
+  <form method="post" onsubmit="return validform()">
+    {% csrf_token %}
+    <!-- add form data -->
+    {% if obj == None %}
+    <div id="tabs1" class="tabs1">
+      <ul>
+        <li><a href="#Pages">Pages</a></li>
+        <li><a href="#Language">Language</a></li>
+      </ul>
+
+      <!-- Page table data add -->
+      <div id="Pages">
+        <table>
+          <tr>
+            <td>Slug</td>
+            <th><input type="text" name="slug" id="slug" required></th>
+          </tr>
+          <tr>
+            <td>Sort Order</td>
+            <th><input type="text" name="sortorder" id="sortorder" required></th>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <th>
+              <select name="status" id="status">
+                <option value="Enabled">Enabled</option>
+                <option value="Disabled">Disabled</option>
+              </select>
+            </th>
+          </tr>
+        </table>
+        <br>
+      </div>
+      <div id="Language"><br>
+        <div id="tabs" class="tabs">
+          <ul>
+            {% for i in lang_data %}
+            <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+            {% endfor %}
+          </ul>
+
+          <!-- Translation table add -->
+          {% for i in lang_data %}
+          <div id="{{i.locale}}">
+            <p>
+            <table>
+              <tr>
+                <th><input type="hidden" name="{{i.locale}}language" id="{{i.locale}}language" value="{{i.locale}}"
+                    required></th>
+              </tr>
+              <tr>
+                <td>Title</td>
+                <th><input type="text" name="{{i.locale}}title" id="title"></th>
+              </tr>
+              <tr>
+                <td>Content</td>
+                <th><input type="text" name="{{i.locale}}content" id="contentt"></th>
+              </tr>
+            </table>
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+        <br>
+      </div>
+
+      <!-- disply/update form -->
+      {% else %}
+      {% for i in page_data %}
+      {% if obj == i.slug %}
+
+      <div id="tabs1" class="tabs1">
+        <ul>
+          <li><a href="#Pages">Pages</a></li>
+          <li><a href="#Language">Language</a></li>
+        </ul>
+        
+        <!-- Page table data disply/update -->
+        <div id="Pages">
+          <table>
+            <tr>
+              <td>Slug</td>
+              <th><input type="text" name="slug" id="slug" value="{{i.slug}}" required></th>
+            </tr>
+            <tr>
+              <td>Sort Order</td>
+              <th><input type="text" name="sortorder" id="sortorder" value="{{i.sortorder}}" required></th>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <th>
+                <select name="status" id="status">
+                  <option value="{{i.status}}">{{i.status}}</option>
+                </select>
+              </th>
+            </tr>
+          </table>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <br>
+        <div id="Language"><br>
+          <div id="tabs" class="tabs">
+            <ul>
+              {% for i in lang_data %}
+              <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+              {% endfor %}
+            </ul>
+
+            <!-- Translation table data disply/update -->
+            {% for i in lang_data %}
+            {% for data in Pages_data %}
+            {% if i.title == data.language|stringformat:'s' %}
+            <div id="{{i.locale}}">
+              <th><input type="hidden" id="{{i.locale}}id" name="{{i.locale}}id" value="{{ data.id }}"></th>
+              <p>
+              <table>
+                <tr>
+                  <td>Language</td>
+                  <th><input type="text" name="{{i.locale}}language" id="{{i.locale}}language" value="{{i.locale}}"
+                      required></th>
+                </tr>
+                <tr>
+                  <td>Title</td>
+                  <th><input type="text" id="{{i.locale}}title" name="{{i.locale}}title" value="{{ data.title }}"
+                      required>
+                  </th>
+                </tr>
+                <tr>
+                  <td>Content</td>
+                  <th><textarea rows="4" id="{{i.locale}}content" name="{{i.locale}}content" cols="50"
+                      required>{{ data.content }}</textarea></th>
+                </tr>
+              </table>
+              </p>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
+          </div>
+          <br>
+        </div><br><br><br>
+        <input type="submit" />
+  </form>
+</body>
+
+{% endblock %}

@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
+TEMPLATE_DIR = os.path.join(BASE_DIR,'Attribute/templates/admin')
 
 
 # Quick-start development settings - unsuitable for production
@@ -41,9 +41,6 @@ INSTALLED_APPS = [
     'Language',
     'Pages',
     'Attribute',
-    'AttributeTraslation',
-    'Option',
-    'OptionTranslation',
 ]
 
 MIDDLEWARE = [
