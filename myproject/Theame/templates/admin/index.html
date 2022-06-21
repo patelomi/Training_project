@@ -1,0 +1,73 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% block extrastyle %}{{block.super}}{% endblock %}
+{% block content %}
+{{block.super}}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Timelime</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Timelime example  -->
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- The time line -->
+                    <div class="timeline">
+                        <!-- timeline time label -->
+                        <div class="time-label">
+                            <span class="bg-green">My Actions</span>
+                        </div>
+                        {% load log %}
+                        {% get_admin_log 10 as admin_log for_user user %}
+                        {% if not admin_log %}
+                        {% else %}
+                        {% for entry in admin_log %}
+                        <div>
+                            {% if entry.is_deletion or not entry.get_admin_url %}
+                            <i class="fas fa-trash bg-red"></i>{% else %}
+                            <i class="fas fa-edit bg-green"></i>
+                                {% endif %}
+                            <div class="timeline-item">
+                                <span class="time"><i class="fas fa-clock"></i></span>
+                                {% if entry.is_deletion or not entry.get_admin_url %}
+                                <h3 class="timeline-header">{{ entry.object_repr }}</h3>{% else %}
+                                <h3 class="timeline-header"><a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a></h3>
+                                {% endif %}
+
+                                {% if entry.content_type %}
+                                <div class="timeline-body">
+                                    {% if entry.is_deletion or not entry.get_admin_url %}
+                                deleted from  {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}{% else %}
+                                Changed from   {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}
+                                {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        <!-- END timeline item -->
+                        <!-- timeline item -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div>
+            <!-- /.timeline -->
+    </section>
+</div>
+{% endblock %}

@@ -1,15 +1,400 @@
-{% extends "admin/change_form.html" %}
-{% load static %}
-{% block extrahead %}
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+{% block extrastyle %}{{block.super}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.2/esm/ionicons.min.js">
+<link rel="stylesheet" type="text/css" href="{% static " admin/css/changelists.css" %}">
+{% if cl.formset %}
+<link rel="stylesheet" type="text/css" href="{% static " admin/css/forms.css" %}">
+{% endif %}
+{% if cl.formset or action_form %}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{% endif %}
+{{ media.css }}
+{% if not actions_on_top and not actions_on_bottom %}
+<style>
+    #changelist table thead th:first-child {
+        width: inherit
+    }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block extrahead %}{{block.super}}
+{{ media.js }}
+
 <!-- Other Js -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 
+{% endblock %}
+{% block content %}
+{{block.super}}
+<body>
+    <!-- Attribute Form Add -->
+    {% if attributeNames is None and optionNames is None %}
+    <!-- Attribute Add -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Add Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+
+                            {% if not is_popup %}
+                    {% block breadcrumbs %}
+                    <div class="breadcrumbs">
+                    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+                    &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+                    &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+                    </div>
+                    {% endblock %}
+                    {% endif %}
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- left column -->
+                    <div class="col-md-12">
+                        <!-- jquery validation -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title"> <strong>Add Data </strong> </h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="attributediv" id="attributediv">
+                                <div id="information">
+                                    <div class="card-body">
+                                    <form id="quickForm" name="myform" method="post">
+                                        <div class="card-body">
+                                            
+                                            {% for i in language %}
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Name [{{i.locale}}]</label>
+                                                
+                                                    <input type="text" id="{{i.locale}}name" name="{{i.locale}}name"
+                                                        class="form-control" required>
+                                                    <input type="hidden" id="{{i.locale}}language"
+                                                        name="{{i.locale}}language" value="{{i.locale}}">
+                                            </div>
+                                            
+                                            {% endfor %}
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Code</label>
+                                                <input type="text" id="code" name="code" class="form-control"
+                                                        required>
+                                            
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Input Type</label>
+                                                
+                                                    <select id="inputtype" name="inputtype" class="form-control"
+                                                        onchange="GetSelectedTextValue(this)" required>
+                                                        <option value="boolean">Boolean</option>
+                                                        <option value="checkbox">Checkbox</option>
+                                                        <option value="radio">Radio</option>
+                                                        <option value="select">Select</option>
+                                                        <option value="multiselect">Multi-select</option>
+                                                        <option value="textbox">TextBox</option>
+                                                        <option value="textarea">Textarea</option>
+                                                    </select>
+                                            </div>    
+                                            
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Is required?</label>
+                                                
+                                                    <select id="required" name="required" class="form-control" required>
+                                                        <option value="yes">Yes</option>
+                                                        <option value="no">No</option>
+                                                    </select>
+                                            </div>    
+                                            
+                                        </div>
+                                        <!-- Attribute end -->
+                                        <!-- Option Add -->
+                                                    <div class="card" id="oprion">
+                                                        <div class="card-header" id="option">
+                                                          <h3 class="card-title"><strong>Add Option</strong></h3>
+                                                          
+                                                          <button type="button" id="add" class="btn btn-success" style="margin-left:1000px ;"><i class="fa-solid fa-plus"></i></button> 
+                                                        </div>
+                                                        <!-- /.card-header -->
+                                                        <div class="card-body p-0">
+                                                          <table class="table table-striped" id="optiontable">
+                                                            <thead>
+                                                              <tr>
+                                                                {% for i in language %}
+                                                                <th>Name [{{i.locale}}]</th>
+                                                                {% endfor %}
+                                                                <th>Custom Option</th>
+                                                                <th>Sort Order</th>
+                                                                <th>Default</th>
+                                                                <th style="width: 40px">Delete</th>
+                                                              </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                              <tr id="oprioncount[0]">
+                                                                {% for i in language %}
+                                                                <td>
+                                                                    <input type="text" id="option{{i.locale}}['0'][opname]"
+                                                                name="option{{i.locale}}['0'][opname]"
+                                                                class="form-control">
+                                                            <input type="hidden"
+                                                                id="option{{i.locale}}['0'][oplanguage]"
+                                                                name="option{{i.locale}}['0'][oplanguage]"
+                                                                value="{{i.locale}}" class="form-control">
+                                                                </td>
+                                                                {% endfor %}
+                                                                <td><input type="text" id="option['0'][customoption]"
+                                                                    name="option['0'][customoption]" class="form-control"></td>
+                                                                <td>
+                                                                    <input type="number" id="option['0'][order]"
+                                                                    name="option['0'][order]" class="form-control">
+                                                                </td>
+                                                                <td>
+                                                                    <input type="radio" class="radio" id="option['0'][default]"
+                                                                name="option['0'][default]" class="form-control">
+                                                                </td>
+                                                                <td><button type="button" class="delete btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                                            </td>
+                                                              </tr>
+                                                            </tbody>
+                                                          </table>
+                                                        </div>
+                                                        <!-- /.card-body -->
+                                                    </div>
+                                           
+                                        <!-- Option End -->
+                                
+
+                            {% csrf_token %}
+                            <div id="submit" class="card-footer">
+                                <input type="submit" class="btn btn-primary" value="ADD">
+                                </form></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </div>
+        <!-- Attribute Form End -->
+
+        <!-- Arribute Update/Delete Form -->
+        {% else %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Change Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+
+                         
+                    <div class="breadcrumbs">
+                    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+                    &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+                    &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+                    </div>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- left column -->
+                    <div class="col-md-12">
+                        <!-- jquery validation -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Update Data</h3>
+                            </div>
+                            <!-- Attribute Update/Delete -->
+                            <div class="attributediv" id="attributediv">
+                                <div id="information">
+                                    <div class="card-body">
+                                    <form method="post" id="quickForm">
+                                        
+                                            {% for i in language %}
+                                            {% if i.locale  ==  attributeNames|get_item:i.locale|get_item:'language' %}
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Name [{{i.locale}}]</label>
+                                                
+                                                
+                                                    <input type="hidden" id="{{i.locale}}attributetranslationid"
+                                                        name="{{i.locale}}attributetranslationid"
+                                                        value="{{attributeNames|get_item:i.locale|get_item:'attributeTranslationId'}}"
+                                                        class="form-control">
+                                                    <input type="text" id="{{i.locale}}name" name="{{i.locale}}name"
+                                                        value="{{attributeNames|get_item:i.locale|get_item:'name'}}"
+                                                        class="form-control" required>
+                                                    <input type="hidden" id="{{i.locale}}language"
+                                                        name="{{i.locale}}language" value="{{i.locale}}"
+                                                        class="form-control">
+                                            </div>    
+                                            
+                                            {% endif %}
+                                            {% endfor %}
+                                            
+                                                {% for i in attributeDetails %}
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">Code</label>
+
+                                                    <input type="text" id="code" name="code" value="{{i.code}}"
+                                                            required class="form-control">
+                                                    <input type="hidden" id="attributeid" name="attributeid"
+                                                            value="{{i.attributeId}}" required class="form-control">
+                                                </div>
+                                            
+                                            
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">Input Type</label>
+                                                
+                                                    <select id="inputtype" name="inputtype" class="form-control"
+                                                        onchange="GetSelectedTextValue(this)" required>
+                                                        <option value="boolean" {% if i.inputType == "boolean" %} selected
+                                                            {% endif %}>Boolean
+                                                        </option>
+                                                        <option value="checkbox" {% if i.inputType == "checkbox" %}
+                                                            selected {% endif %}>
+                                                            Checkbox
+                                                        </option>
+                                                        <option value="radio" {% if i.inputType == "radio" %} selected {% endif %}>Radio
+                                                        </option>
+                                                        <option value="select">Select</option>
+                                                        <option value="multiselect" {% if i.inputType == "multiselect" %}
+                                                            selected {% endif %}>
+                                                            Multi-select</option>
+                                                        <option value="textbox" {% if i.inputType == "textbox" %} selected
+                                                            {% endif %}>TextBox
+                                                        </option>
+                                                        <option value="textarea" {% if i.inputType == "textarea" %}
+                                                            selected {% endif %}>
+                                                            Textarea
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            
+                                            
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">Is required?</label>
+                                                
+                                                    <select id="required" name="required" class="form-control" required>
+                                                        <option value="yes" {% if i.isRequired == "yes" %} selected {% endif %}>Yes</option>
+                                                        <option value="no" {% if i.isRequired == "no" %} selected {% endif %}>No</option>
+                                                    </select>
+                                                </div>
+                                            
+                                            {% endfor %}
+                                        
+                                        <!-- Attribute Update/Delete End -->
+                                        
+                                        <!-- Option Update/Delete -->
+                                        <div class="card" id="oprion">
+                                            <div class="card-header" id="option">
+                                              <h3 class="card-title"><strong>Add Option</strong></h3>
+                                              
+                                              <button type="button" id="add" class="btn btn-success" style="margin-left:1000px ;"><i class="fa-solid fa-plus"></i></button> 
+                                            </div>
+                                            <!-- /.card-header -->
+                                            <div class="card-body p-0">
+                                              <table class="table table-striped" id="optiontable">
+                                                <thead>
+                                                    <tr>
+                                                        {% for i in language %}
+                                                        <th>Name [{{i.locale}}]</th>
+                                                        {% endfor %}
+                                                        <th>Custom Option</th>
+                                                        <th>Sort Order</th>
+                                                        <th>Default</th>
+                                                        <th style="width: 40px">Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for i in optionDetails %}
+                                                    <tr id="oprioncount[{{forloop.counter0}}]">
+                                                        {% for j in language %}
+                                                        {% if j.locale  == optionNames|get_item:j.locale|get_item:i.customOption|get_item:'language' %}
+                                                        <input type="hidden"
+                                                            id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][optiontranslationid]"
+                                                            name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][optiontranslationid]"
+                                                            value="{{optionNames|get_item:j.locale|get_item:i.customOption|get_item:'optionTranslationId'}}"
+                                                            class="form-control"
+                                                            required>
+                                                        <td><input type="text"
+                                                                id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][opname]"
+                                                                name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][opname]"
+                                                                value="{{optionNames|get_item:j.locale|get_item:i.customOption|get_item:'name'}}"
+                                                                class="form-control"
+                                                                required></td>
+                                                        <input type="hidden"
+                                                            id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][oplanguage]"
+                                                            name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][oplanguage]"
+                                                            value="{{j.locale}}"
+                                                            class="form-control" required>
+                                                        {% endif %}
+                                                        {% endfor %}
+                                                        <td><input type="text"
+                                                                id="option[{{forloop.counter0}}][customoption]"
+                                                                name="option[{{forloop.counter0}}][customoption]"
+                                                                value="{{i.customOption}}" 
+                                                                class="form-control"
+                                                                required></td>
+
+                                                        <input type="hidden" id="option[{{forloop.counter0}}][optionid]"
+                                                            name="option[{{forloop.counter0}}][optionid]"
+                                                            value="{{i.optionId}}" 
+                                                            class="form-control"
+                                                            required>
+
+                                                        <td><input type="number"
+                                                                id="option[{{forloop.counter0}}][order]"
+                                                                name="option[{{forloop.counter0}}][order]"
+                                                                value="{{i.sortOrder}}" 
+                                                                class="form-control"
+                                                                required>
+                                                        </td>
+
+                                                        <td><input type="radio" class="radio"
+                                                                id="option[{{forloop.counter0}}][default]"
+                                                                name="option[{{forloop.counter0}}][default]" {% if i.isDefault == True %} checked {% endif %} class="form-control"></td>
+                                                        <td id="{{i.optionId}}"><button type="button" class="delete btn btn-danger"><i class="fa-solid fa-trash"></i></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Option Update/Delete End -->
+                                </div>
+                            </div>
+
+                            {% csrf_token %}
+                            <div id="submit" class="card-footer">
+                                <input type="submit" class="btn btn-primary" value="Save Change">
+                                </form></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Attribute Update/Delete End -->
+    </div>
+    {% endif %}
+</body>
 <!-- Add Js for Attribute -->
 <script>
     $(function () {
@@ -24,7 +409,7 @@
             $("#oprion").hide()
             $("#oprioncount td input").prop('required', false);
         }
-        
+
         $(".radio").change(function () {
             $(".radio").not(this).prop('checked', false);
         });
@@ -36,17 +421,17 @@
                 var html = `<tr id="oprioncount[${count}]">
             {% for i in language %}
               <td>
-                <input type="text" id="option{{i.locale}}['${count}'][opname]" name="option{{i.locale}}['${count}'][opname]" required>
-                <input type="hidden" id="option{{i.locale}}['${count}'][oplanguage]" name="option{{i.locale}}['${count}'][oplanguage]" value="{{i.locale}}">
+                <input type="text" id="option{{i.locale}}['${count}'][opname]" name="option{{i.locale}}['${count}'][opname]" class="form-control" required>
+                <input type="hidden" id="option{{i.locale}}['${count}'][oplanguage]" name="option{{i.locale}}['${count}'][oplanguage]" class="form-control" value="{{i.locale}}">
               </td>
             {% endfor %}
-            <td><input type="text" id="option['${count}'][customoption]" name="option['${count}'][customoption]" required></td>
+            <td><input type="text" id="option['${count}'][customoption]" name="option['${count}'][customoption]" class="form-control" required></td>
             
-            <td><input type="number" id"option['${count}'][order]" name="option['${count}'][order]" required></td>
+            <td><input type="number" id"option['${count}'][order]" name="option['${count}'][order]" class="form-control" required></td>
             
-            <td><input type="radio" class="radio" id="option['${count}'][default]" name="option['${count}'][default]" ></td>
+            <td><input type="radio" class="radio" id="option['${count}'][default]" name="option['${count}'][default]" class="form-control"></td>
     
-            <td><input type="button" class="delete" value="delete" style="background-color: #a41515;"></td>
+            <td><button type="button" class="delete btn btn-danger"><i class="fa-solid fa-trash"></i></button></td>
           </tr>`;
                 $("#optiontable").append(html);
             }
@@ -68,7 +453,7 @@
             $(event.target).closest("tr").remove();
             countdelete++;
         });
-        
+
         $("#inputtype").change(function () {
             if (jQuery.inArray($("#inputtype").val(), arr) != -1) {
                 $("#oprion").show()
@@ -82,237 +467,4 @@
     });
 </script>
 <!-- End Js -->
-
-{% endblock %}
-{% block content %}
-
-<body>
-    <!-- Attribute Form Add -->
-    {% if attributeNames is None and optionNames is None %}
-    <!-- Attribute Add -->
-    <div class="attributediv" id="attributediv">
-        <div id="information">
-            <form id="myform" name="myform" method="post">
-                <table>
-                    {% for i in language %}
-                    <tr>
-                        <td>Name [{{i.locale}}]</td>
-                        <td>
-                            <input type="text" id="{{i.locale}}name" name="{{i.locale}}name" required>
-                            <input type="hidden" id="{{i.locale}}language" name="{{i.locale}}language"
-                                value="{{i.locale}}">
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    <tr>
-                        <td>Code</td>
-                        <td><input type="text" id="code" name="code" required></td>
-                    </tr>
-                    <tr>
-                        <td>Input Type</td>
-                        <td>
-                            <select id="inputtype" name="inputtype"class="inputtype" onchange="GetSelectedTextValue(this)" required>
-                                <option value="boolean">Boolean</option>
-                                <option value="checkbox">Checkbox</option>
-                                <option value="radio">Radio</option>
-                                <option value="select">Select</option>
-                                <option value="multiselect">Multi-select</option>
-                                <option value="textbox">TextBox</option>
-                                <option value="textarea">Textarea</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Is required?</td>
-                        <td>
-                            <select id="required" name="required" required>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-                <!-- Attribute end -->
-                <br><br>
-                <!-- Option Add -->
-                <div class="oprion" id="oprion">
-                    <div id="option">
-                        <table id="optiontable">
-                            <div class="breadcrumbs">
-                                › Add Option <input type="button" id="add" value="Add" style="background-color: #006b1b;">
-                            </div>
-                            <br>
-                            <tr>
-                                {% for i in language %}
-                                <th>Name [{{i.locale}}]</th>
-                                {% endfor %}
-                                <th>Custom Option</th>
-                                <th>Sort Order</th>
-                                <th>Default</th>
-                                <th>Delete</th>
-                            </tr>
-                            <tr id="oprioncount[0]">
-                                {% for i in language %}
-                                <td>
-                                    <input type="text" id="option{{i.locale}}['0'][opname]"
-                                        name="option{{i.locale}}['0'][opname]">
-                                    <input type="hidden" id="option{{i.locale}}['0'][oplanguage]"
-                                        name="option{{i.locale}}['0'][oplanguage]" value="{{i.locale}}">
-                                </td>
-                                {% endfor %}
-                                <td><input type="text" id="option['0'][customoption]" name="option['0'][customoption]">
-                                </td>
-
-                                <td><input type="number" id="option['0'][order]" name="option['0'][order]"></td>
-
-                                <td><input type="radio" class="radio" id="option['0'][default]"
-                                        name="option['0'][default]"></td>
-                                <td><input type="button" class="delete" value="Delete" style="background-color: #a41515;"></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <!-- Option End -->
-        </div>
-    </div>
-    {% csrf_token %}
-    <div id="submit">
-        <br><br>
-        <input type="submit">
-        </form>
-        <!-- Attribute Form End -->
-    </div>
-    <!-- Arribute Update/Delete Form -->
-    {% else %}
-    <!-- Attribute Update/Delete -->
-    <div class="attributediv" id="attributediv">
-        <div id="information">
-            <form method="post">
-                <table>
-                    {% for i in language %}
-                    {% if i.locale == attributeNames|get_item:i.locale|get_item:'language' %}
-                    <tr>
-                        <td>Name [{{i.locale}}]</td>
-                        <td>
-                            <input type="hidden" id="{{i.locale}}attributetranslationid"
-                                name="{{i.locale}}attributetranslationid"
-                                value="{{attributeNames|get_item:i.locale|get_item:'attributeTranslationId'}}">
-                            <input type="text" id="{{i.locale}}name" name="{{i.locale}}name"
-                                value="{{attributeNames|get_item:i.locale|get_item:'name'}}" required>
-                            <input type="hidden" id="{{i.locale}}language" name="{{i.locale}}language"
-                                value="{{i.locale}}">
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% endfor %}
-                    <tr>
-                        {% for i in attributeDetails %}
-                        <td>Code</td>
-                        <td><input type="text" id="code" name="code" value="{{i.code}}" required></td>
-                        <td><input type="hidden" id="attributeid" name="attributeid" value="{{i.attributeId}}" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Input Type</td>
-                        <td>
-                            <select id="inputtype" name="inputtype" class="inputtype" onchange="GetSelectedTextValue(this)" required>
-                                <option value="boolean" {% if i.inputType == "boolean" %} selected {% endif %}>Boolean
-                                </option>
-                                <option value="checkbox" {% if i.inputType == "checkbox" %} selected {% endif %}>Checkbox
-                                </option>
-                                <option value="radio" {% if i.inputType == "radio" %} selected {% endif %}>Radio</option>
-                                <option value="select">Select</option>
-                                <option value="multiselect" {% if i.inputType == "multiselect" %} selected {% endif %}>
-                                    Multi-select</option>
-                                <option value="textbox" {% if i.inputType == "textbox" %} selected {% endif %}>TextBox
-                                </option>
-                                <option value="textarea" {% if i.inputType == "textarea" %} selected {% endif %}>Textarea
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Is required?</td>
-                        <td>
-                            <select id="required" name="required" required>
-                                <option value="yes" {% if i.isRequired == "yes" %} selected {% endif %}>Yes</option>
-                                <option value="no" {% if i.isRequired == "no" %} selected {% endif %}>No</option>
-                            </select>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                <!-- Attribute Update/Delete End -->
-                <br><br>
-                <!-- Option Update/Delete -->
-                <div class="oprion" id="oprion">
-                    <div id="option">
-                        <table id="optiontable">
-                            <div class="breadcrumbs">
-                                › Add Option <input type="button" id="add" value="Add" style="background-color: #006b1b;">
-                            </div>
-                            <br>
-                            <tr>
-                                {% for i in language %}
-                                <th>Name [{{i.locale}}]</th>
-                                {% endfor %}
-                                <th>Custom Option</th>
-                                <th>Sort Order</th>
-                                <th>Default</th>
-                                <th>Delete</th>
-                            </tr>
-
-                            {% for i in optionDetails %}
-                            <tr id="oprioncount[{{forloop.counter0}}]">
-                                {% for j in language %}
-                                {% if j.locale == optionNames|get_item:j.locale|get_item:i.customOption|get_item:'language' %}
-                                <input type="hidden"
-                                    id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][optiontranslationid]"
-                                    name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][optiontranslationid]"
-                                    value="{{optionNames|get_item:j.locale|get_item:i.customOption|get_item:'optionTranslationId'}}"
-                                    required>
-                                <td><input type="text"
-                                        id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][opname]"
-                                        name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][opname]"
-                                        value="{{optionNames|get_item:j.locale|get_item:i.customOption|get_item:'name'}}"
-                                        required></td>
-                                <input type="hidden"
-                                    id="option{{j.locale}}['{{forloop.parentloop.counter0}}'][oplanguage]"
-                                    name="option{{j.locale}}['{{forloop.parentloop.counter0}}'][oplanguage]"
-                                    value="{{j.locale}}" required>
-                                {% endif %}
-                                {% endfor %}
-                                <td><input type="text" id="option[{{forloop.counter0}}][customoption]"
-                                        name="option[{{forloop.counter0}}][customoption]" value="{{i.customOption}}"
-                                        required></td>
-
-                                <input type="hidden" id="option[{{forloop.counter0}}][optionid]"
-                                    name="option[{{forloop.counter0}}][optionid]" value="{{i.optionId}}" required>
-
-                                <td><input type="number" id="option[{{forloop.counter0}}][order]"
-                                        name="option[{{forloop.counter0}}][order]" value="{{i.sortOrder}}" required>
-                                </td>
-
-                                <td><input type="radio" class="radio" id="option[{{forloop.counter0}}][default]"
-                                        name="option[{{forloop.counter0}}][default]" {% if i.isDefault == True %} checked {% endif %}></td>
-                                <td id="{{i.optionId}}"><input type="button" class="delete" value="Delete" style="background-color: #a41515;"></td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div>
-                <!-- Option Update/Delete End -->
-        </div>
-    </div>
-
-    {% csrf_token %}
-    <div id="submit">
-        <br><br>
-        <input type="submit" value="Save">
-    </div>
-    </form>
-<!-- Attribute Update/Delete End -->
-    {% endif %}
-</body>
-<!-- {{block.super}} -->
 {% endblock %}

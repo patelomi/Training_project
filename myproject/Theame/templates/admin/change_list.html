@@ -1,0 +1,64 @@
+{% include 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_list %}
+{% block content %}
+
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>{{ cl.opts.verbose_name_plural|capfirst }}</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Home</a></li>
+            <li class="breadcrumb-item active">{{ cl.opts.verbose_name_plural|capfirst }}</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      {% for message in messages %}
+          <div class="alert alert-success">
+            <a class="close" href="#" data-dismiss="alert">×</a>
+           {{ message }}
+          </div>
+          {% endfor %}
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <form id="changelist-form" method="post" {% if cl.formset and cl.formset.is_multipart %}
+              enctype="multipart/form-data" {% endif %} novalidate>{% csrf_token %}
+              {% endblock %}
+              {% if cl.formset %}
+              <div>{{ cl.formset.management_form }}</div>
+              {% endif %}
+              {% block result_list %}
+              <div class="card-header">
+                <div style="margin-left: 1000px;">
+                  {% block object-tools %}
+                  {% block object-tools-items %}
+                  <button type="button" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> {% change_list_object_tools %}</button>
+                  {% endblock %}
+                </div>
+                {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                {% result_list cl %}
+                {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+              </div>
+              {% endblock %}
+            </form>
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+</div>
+{% endblock %}

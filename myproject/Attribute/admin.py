@@ -21,7 +21,7 @@ class FetchError(Error):
     pass
 
 class AttributeAdmin(admin.ModelAdmin):
-    list_display = ['code', 'inputType', 'isRequired']
+    list_display = ['code', 'inputType', 'isRequired','created_at','updated_at']
 
     def changeform_view(self, request, obj, form_url, extra_context=None):
         extra_context = extra_context or {}

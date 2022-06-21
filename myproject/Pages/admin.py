@@ -14,7 +14,7 @@ class PageLanguageInline(admin.StackedInline):
 
 
 class PagesAdmin(admin.ModelAdmin):
-    list_display = ['slug', 'status']
+    list_display = ['slug', 'status','created_at','updated_at']
 
     # Quars for sending data
     def changeform_view(self, request, obj, form_url="", extra_context=None):

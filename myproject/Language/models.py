@@ -20,6 +20,8 @@ class Language(models.Model):
     icon = models.ImageField(("Icon"),upload_to="images/")
     isdefault = models.CharField(("Is Default"),max_length=10,choices=choice,default=False)
     status = models.CharField(("Status"),max_length=10,choices=statuschoice,default='Enabled')
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return str(self.title)

@@ -1,0 +1,46 @@
+{% load i18n %}
+{% if app_list %}
+{% for app in app_list %} <br>
+<li class="nav-item menu-open">
+  <a href="#" class="nav-link">
+    <i class="nav-icon fas fa-table"></i>
+    <p>
+      {{ app.name }}
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    {% for model in app.models %}
+    {% if model.admin_url %}
+    <li class="nav-item">
+      <a href="{{ model.admin_url }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>{{ model.name }}</p><a style="margin-left: 20px; color: white;" href="{{ model.add_url }}" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a>
+      </a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>{{ model.name }}</p>
+      </a>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+
+</li>
+
+
+<!-- {% if model.add_url %}
+              <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+            {% else %} -->
+<!-- <td></td>
+            {% endif %} -->
+
+
+
+{% endfor %}
+{% else %}
+<p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
+{% endif %}

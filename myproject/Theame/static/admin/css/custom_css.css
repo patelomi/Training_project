@@ -1,0 +1,40 @@
+aside{
+    background-color: white !important;
+}
+
+[class*=sidebar-dark-] .nav-sidebar>.nav-item.menu-open>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item:hover>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item>.nav-link:focus
+{
+    color: black !important;
+    background-color: #a3acb6;
+}
+
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link
+{
+    color: black !important;
+}
+
+[class*=sidebar-dark-] .sidebar a
+{
+    color: black !important;
+}
+
+[class*=sidebar-dark] .brand-link, [class*=sidebar-dark] .brand-link .pushmenu
+{
+    color: black !important;
+}
+
+.navbar-light
+{
+   background-color:#212529 !important;
+}
+
+.navbar-light .navbar-nav .nav-link
+{
+    color: white !important;
+}
+
+.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active
+{
+    background-color: #007bff !important;
+    color: white !important;
+}

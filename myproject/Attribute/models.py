@@ -1,3 +1,5 @@
+from datetime import datetime
+from turtle import update
 from django.db import models
 from Language.models import Language
 from django.db import transaction
@@ -21,6 +23,8 @@ class attribute(models.Model):
         ('no','No'),
     )
     isRequired = models.CharField(("Is Required"),max_length=10,choices=requiredChoice,default='yes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.code)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.db.models import Model
 from tinymce import models as tinymce_models
@@ -19,6 +20,8 @@ class Pages(models.Model):
     )
     status = models.CharField(("Status"),max_length=10,choices=statuschoice,default='Enabled')
     sortorder = models.IntegerField(("Sort Order"),default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return str(self.slug)
