@@ -115,3 +115,4 @@ class PageLanguageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Pages, PagesAdmin)
+# admin.site.register(PageLanguage)

@@ -1,0 +1,611 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_modify %}
+{% block extrastyle %}{{block.super}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.2/esm/ionicons.min.js">
+<link rel="stylesheet" type="text/css" href="{% static " admin/css/changelists.css" %}">
+{% if cl.formset %}
+<link rel="stylesheet" type="text/css" href="{% static " admin/css/forms.css" %}">
+{% endif %}
+{% if cl.formset or action_form %}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{% endif %}
+{{ media.css }}
+{% if not actions_on_top and not actions_on_bottom %}
+<style>
+    #changelist table thead th:first-child {
+        width: inherit
+    }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block extrahead %}{{block.super}}
+{{ media.js }}
+
+<!-- Other Js -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+{% endblock %}
+{% block content %}
+{{block.super}}
+
+<body>
+    {% if banner_data is None %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Add Banner</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            {% if not is_popup %}
+                            {% block breadcrumbs %}
+                            <div class="breadcrumbs">
+                                <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                                &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">
+                                    {{ opts.app_config.verbose_name }}</a>
+                                &rsaquo; {% if has_view_permission %}<a
+                                    href="{% url opts|admin_urlname:'changelist' %}">
+                                    {{ opts.verbose_name_plural|capfirst }}</a>{% else %}
+                                    {{ opts.verbose_name_plural|capfirst }}
+                                {% endif %}
+                                &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}
+                                Add {{ name }}{%endblocktranslate %}
+                                {% else %}{{ original|truncatewords:"18" }}{% endif %}
+                            </div>
+                            {% endblock %}
+                            {% endif %}
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <form id="bannerform" method="POST" name="bannerform" class="bannerform" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- left column -->
+                        <div class="col-md-12">
+                            <!-- jquery validation -->
+                            <div class="row">
+                                <div class="card-body">
+                                    <div class="card card-primary card-outline card-outline-tabs">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="custom-tabs-four-home-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-home" role="tab"
+                                                        aria-controls="custom-tabs-four-home"
+                                                        aria-selected="true">Banner information &nbsp;
+                                                        <i class="fa-solid fa-images"></i></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="custom-tabs-four-profile-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-profile" role="tab"
+                                                        aria-controls="custom-tabs-four-profile"
+                                                        aria-selected="false">Language Translation &nbsp;
+                                                        <i class="fa-solid fa-language"></i></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                                <div class="tab-pane fade show active" id="custom-tabs-four-home"
+                                                    role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label>Banner Group *</label>
+                                                            <select class="form-control select2" multiple="multiple"
+                                                                id="group" name="group"
+                                                                data-placeholder="Select Banner Group"
+                                                                style="width: 100%;">
+                                                                {% for bgd in bannergroupdata %}
+                                                                <option value="{{bgd.bgid}}">{{bgd.code}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleInputEmail1">Sort Order *</label>
+                                                            <input type="number" name="sortorder" id="sortorder"
+                                                                class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox" id="isfeatured"
+                                                                        name="isfeatured">
+                                                                    <label>Is Featured?</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card" id="oprion">
+                                                            <div class="card-body p-0">
+                                                                <table class="table table-striped" id="optiontable">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Banner Group</th>
+                                                                            <th>Image</th>
+                                                                            <th>URL</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel"
+                                                    aria-labelledby="custom-tabs-four-profile-tab">
+                                                    <div class="card card-primary">
+                                                        <div id="tabs" class="tabs">
+                                                            <ul>
+                                                                {% for i in lang_data %}
+                                                                <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            {% for i in lang_data %}
+                                                            <div id="{{i.locale}}">
+                                                                <p>
+                                                                <div class="form-group">
+                                                                    <input type="hidden" name="{{i.locale}}language"
+                                                                        id="{{i.locale}}language" value="{{i.locale}}"
+                                                                        class="form-control">
+                                                                    <label for="exampleInputEmail1">Title *</label>
+                                                                    <input type="text" name="{{i.locale}}title"
+                                                                        id="title" class="form-control" required minlength="3">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputEmail1">Content
+                                                                        *</label>
+                                                                    <textarea name="{{i.locale}}content" id="content"
+                                                                        class="form-control" rows="3" required minlength="3"></textarea>
+                                                                </div>
+                                                                </p>
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.card -->
+                                    </div>
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!--/.col (left) -->
+                        </div>
+                        <!-- /.row -->
+                    </div><!-- /.container-fluid -->
+            </section>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Add Banner</button>
+            </div>
+        </form>
+    </div>
+
+    {% else %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Update Banner</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            {% if not is_popup %}
+                            <div class="breadcrumbs">
+                                <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                                &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">
+                                    {{ opts.app_config.verbose_name }}</a>
+                                &rsaquo; {% if has_view_permission %}<a
+                                    href="{% url opts|admin_urlname:'changelist' %}">
+                                    {{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{
+                                opts.verbose_name_plural|capfirst }}
+                                {% endif %}
+                                &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name
+                                }}{%endblocktranslate %}
+                                {% else %}{{ original|truncatewords:"18" }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <form id="bannerform" method="POST" name="bannerform" class="bannerform" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- left column -->
+                        <div class="col-md-12">
+                            <!-- jquery validation -->
+                            <div class="row">
+                                <div class="card-body">
+                                    <div class="card card-primary card-outline card-outline-tabs">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="custom-tabs-four-home-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-home" role="tab"
+                                                        aria-controls="custom-tabs-four-home"
+                                                        aria-selected="true">Banner information &nbsp;
+                                                        <i class="fa-solid fa-images"></i></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="custom-tabs-four-profile-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-profile" role="tab"
+                                                        aria-controls="custom-tabs-four-profile"
+                                                        aria-selected="false">Language Translation &nbsp;
+                                                        <i class="fa-solid fa-language"></i></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                                <div class="tab-pane fade show active" id="custom-tabs-four-home"
+                                                    role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                                                    <div class="card-body">
+
+                                                        <div class="form-group">
+                                                            <label>Banner Group *</label>
+                                                            <select class="select2" multiple="multiple" id="group"
+                                                                name="group" data-placeholder="Select Banner Group"
+                                                                style="width: 100%;">
+                                                                {% for bgd in bannergroupdata %}
+                                                                <option value="{{bgd.bgid}}" {% for bi in banner_image %} 
+                                                                {% if bi.bannergroup_id == bgd.bgid %} selected {% endif %}
+                                                                {% endfor %}>{{bgd.code}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        {% for b in banner_data %}
+                                                        <div class="form-group">
+                                                            <label for="exampleInputEmail1">Sort Order *</label>
+                                                            <input type="number" name="sortorder" id="sortorder"
+                                                                class="form-control" value="{{b.sortorder}}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group my-4">
+                                                                    {% if b.isfeatured  ==  "Yes" %}
+                                                                    <input type="checkbox" id="isfeatured"
+                                                                        name="isfeatured" checked>
+                                                                    <label>Is Featured?</label>
+                                                                    {% else %}
+                                                                    <input type="checkbox" id="isfeatured"
+                                                                        name="isfeatured">
+                                                                    <label>Is Featured?</label>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                        <div class="card" id="oprion">
+                                                            <div class="card-body p-0">
+                                                                <table class="table table-striped" id="optiontable">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Banner Group</th>
+                                                                            <th>Image</th>
+                                                                            <th>URL</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for bi in banner_image %}
+                                                                        <tr id="{{bi.bannergroup_id}}">
+                                                                            <td><label>{{bi.bannergroup}}</label>
+                                                                                <input type="hidden"
+                                                                                    name="option['{{bi.bannergroup_id}}'][biid]"
+                                                                                    id="biid" value="{{bi.biid}}"
+                                                                                    class="form-control">
+                                                                                <input type="hidden"
+                                                                                    name="option['{{bi.bannergroup_id}}'][bannergroup]"
+                                                                                    id="option['{{bi.bannergroup_id}}'][bannergroup]"
+                                                                                    value="{{bi.bannergroup_id}}"
+                                                                                    class="form-control">
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="form-group">
+                                                                                    <img src="{{ bi.image.url }}"
+                                                                                        alt="{{ bi.image }}"
+                                                                                        height="50px" width="50px"
+                                                                                        id="img">
+                                                                                    <div class="input-group">
+                                                                                        <div class="custom-file">
+                                                                                            <input type="file"
+                                                                                                name="image[{{bi.bannergroup_id}}]"
+                                                                                                class="custom-file-input"
+                                                                                                id="image[{{bi.bannergroup_id}}]"
+                                                                                                multiple
+                                                                                                accept="image/jpeg, image/png, image/jpg"
+                                                                                                onchange="readURL(this)">
+                                                                                            <label
+                                                                                                class="custom-file-label">
+                                                                                                {{ bi.image }}</label>
+                                                                                        </div>
+                                                                                        <div class="input-group-append">
+                                                                                            <span
+                                                                                                class="input-group-text"><i
+                                                                                                    class="fa-regular fa-file-image"></i></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="callout callout-warning">
+                                                                                    <strong>Note</strong>
+                                                                                    <li>Maximum size : 2 MB</li>
+                                                                                    <li>Allowed file type : jpeg,
+                                                                                        jpg,
+                                                                                        png</li>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="form-group">
+                                                                                    <input type="url"
+                                                                                        name="option['{{bi.bannergroup_id}}'][url]"
+                                                                                        id="URL"
+                                                                                        class="form-control URL"
+                                                                                        value="{{bi.url}}">
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel"
+                                                    aria-labelledby="custom-tabs-four-profile-tab">
+                                                    <div class="card card-primary">
+                                                        <div id="tabs" class="tabs">
+                                                            <ul>
+                                                                {% for i in lang_data %}
+                                                                <li><a href="#{{i.locale}}">{{i.title}}</a></li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            {% for i in lang_data %}
+                                                            {% for bt in bannertran_data %}
+                                                            {% if i.title == bt.language|stringformat:'s' %}
+                                                            <div id="{{i.locale}}">
+                                                                <p>
+                                                                <div class="form-group">
+                                                                    <input type="hidden" name="{{i.locale}}language"
+                                                                        id="{{i.locale}}language" value="{{i.locale}}"
+                                                                        class="form-control">
+                                                                    <input type="hidden" name="{{i.locale}}btid"
+                                                                        id="{{i.locale}}btid" value="{{bt.btid}}"
+                                                                        class="form-control">
+                                                                    <label for="exampleInputEmail1">Title *</label>
+                                                                    <input type="text" name="{{i.locale}}title"
+                                                                        id="title" class="form-control"
+                                                                        value="{{bt.title}}" required minlength="3">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputEmail1">Content
+                                                                        *</label>
+                                                                    <textarea name="{{i.locale}}content" id="content"
+                                                                        class="form-control"
+                                                                        rows="3" required minlength="3">{{bt.content}}</textarea>
+                                                                </div>
+                                                                </p>
+                                                            </div>
+                                                            {% endif %}
+                                                            {% endfor %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.card -->
+                                    </div>
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!--/.col (left) -->
+                        </div>
+                        <!-- /.row -->
+                    </div><!-- /.container-fluid -->
+            </section>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Update Banner</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <script type="text/javascript">
+        $(function () {
+            $('.bannerform').validate({
+                rules: {
+                    group: {
+                        required: true,
+                    },
+                    sortorder: {
+                        required: true,
+                    },
+                    title: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 3,
+                    },
+                    content: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 3,
+                    },
+                    URL: {
+                        url: true,
+                    }
+                },
+                messages: {
+                    group: {
+                        required: "Please Enter Banner Group",
+                    },
+                    sortorder: {
+                        required: "Please Enter Sort Order",
+                    },
+                    title: {
+                        required: "Please Enter a Title",
+                        minlength: "Your Title must be at least 3 characters long",
+                        maxlength: "Your Title must be 3 characters long",
+                    },
+                    URL: {
+                        url: "Please Enter Proper URL",
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+            const urlPattern = new RegExp('(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?');
+            if ($(".URL").val()  ==  '') {
+                return true;
+            }
+            if ($(".URL").val() != urlPattern) {
+                // alert("Envalid")
+            }
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#tabs").tabs();
+
+            $("#group").change(function () {
+                Selected = $(this).val();
+                var arry = []
+                $("#group option:selected").each(function () {
+                    arry.push($.trim(($(this).text())))
+                });
+                $("#group option:not(:selected)").each(function () {
+
+                    var biid = $("#" + $(this).val() + " #biid").val();
+                    var htmlbiid = `<input type="hidden"
+                                                                                        name="bannerimage[0]"
+                                                                                        id="bannerimage[0]"
+                                                                                        value = "${biid}"
+                                                                                        class="form-control">`;
+                    if (biid != undefined) {
+                        console.log(biid)
+                        $("#oprion").append(htmlbiid);
+                    }
+
+
+                    $("#" + $(this).val()).remove();
+
+                });
+
+                var count = Selected.length;
+                $('#oprion').show();
+                for (var i = 0; i < count; i++) {
+
+                    if ($("#" + Selected[i]).length > 0) {
+
+                    }
+                    else {
+
+                        var html = `<tr id="${Selected[i]}">
+                                                                            <td><label>${arry[i]}</label>
+                                                                                <input type="hidden"
+                                                                                        name="option[${Selected[i]}][bannergroup]"
+                                                                                        id="option[${Selected[i]}][bannergroup]"
+                                                                                        value= "${Selected[i]}" 
+                                                                                        class="form-control">
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="form-group">
+                                                                                    <input type="file" name="image[${Selected[i]}]"
+                                                                        id="image[${Selected[i]}]" class="form-control" required>
+                                                                                </div>
+                                                                                <div class="callout callout-warning">
+                                                                                    <strong>Note</strong>
+                                                                                    <li>Maximum size : 2 MB</li>
+                                                                                    <li>Allowed file type : jpeg,
+                                                                                        jpg,
+                                                                                        png</li>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="form-group">
+                                                                                    <input type="url"
+                                                                                        name="option[${Selected[i]}][url]"
+                                                                                        id="option[${Selected[i]}][url]"
+                                                                                        class="form-control">
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>`;
+                        $("#optiontable").append(html);
+
+                    }
+                }
+
+
+            })
+
+        });
+        $(function () {
+            bsCustomFileInput.init();
+        });
+    </script>
+    <script>
+
+        //Initialize Select2 Elements
+        $('.select2').select2()
+
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+    </script>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#img').attr('src', e.target.result).width(50).height(50);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+<script>
+    tinymce.init({
+    selector: '#content',
+    plugins: [
+      'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+      'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+      'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+    ],
+    toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+      'alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+  });
+  </script>
+
+</body>
+{% endblock %}

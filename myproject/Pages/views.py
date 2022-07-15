@@ -37,38 +37,3 @@
 
 #     return render(request,'admin/Pages/Home.html',{'contentdata':pagedetails,'pages':pages,"language":listdata,"datalist":request.session['data'],"language":language})
 
-
-# # <table class="optiontable" id="optiontable">
-# #     <tr>
-# #                     {% for i in lang_data %}
-# #                     <th>Name [{{i.locale}}]</th>
-# #                     {% endfor %}
-# #                     <th>Custom Option</th>
-# #                     <th>Sort Order</th>
-# #                     <th>Default?</th>
-# #                     <th>Delete</th>
-# #                 </tr>
-# #                 <tr>
-# #                     {% for i in lang_data %}
-# #                     {% for data in opt_data %}
-# #                     {% if i.locale == data.language_id %}
-# #                     <input type="hidden" value="{{i.locale}}" name="option{{i.locale}}[oplanguage]"
-# #                         id="option{{i.locale}}[oplanguage]" required>
-# #                     <td><input type="text" name="option{{i.locale}}[opname]" id="option{{i.locale}}[opname]"
-# #                             value="{{data.name}}" required></td>
-# #                     {% endif %}
-# #                     {% endfor %}
-# #                     {% endfor %}
-# #                     {% for i in option_data %}
-# #                     <td><input type="text" name="option[option]" id="option[option]" value="{{i.coustomoption}}"
-# #                             required></td>
-# #                     <td><input type="text" name="option[order]" id="option[order]" value="{{i.sortorder}}" required>
-# #                     </td>
-# #                     <td><select>
-# #                             <option disabled selected>------</option>
-# #                             <option selected value="{{i.default}}">{{i.default}}</option>
-# #                         </select></td>
-# #                     <td><input type="button" onclick="deletedata()" value="delete" style="background-color: #a41515;">
-# #                     </td>
-# #                     {% endfor %}
-# #             </table>

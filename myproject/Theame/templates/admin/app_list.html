@@ -1,6 +1,6 @@
 {% load i18n %}
 {% if app_list %}
-{% for app in app_list %} <br>
+<!-- {% for app in app_list %} <br>
 <li class="nav-item menu-open">
   <a href="#" class="nav-link">
     <i class="nav-icon fas fa-table"></i>
@@ -32,15 +32,123 @@
 </li>
 
 
-<!-- {% if model.add_url %}
+{% if model.add_url %}
               <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
-            {% else %} -->
-<!-- <td></td>
-            {% endif %} -->
+            {% else %}
+<td></td>
+            {% endif %}
 
 
 
-{% endfor %}
+{% endfor %} -->
+
+
+<li class="nav-item menu-open">
+  <a href="#" class="nav-link">
+    <i class="fa-solid fa-user-gear"></i> &nbsp;
+    <p>
+      Authentication
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    <li class="nav-item">
+      <a href="/admin/auth/group/" class="nav-link">
+        <i class="fa-solid fa-users"></i> &nbsp;
+        <p>Groups</p>
+        <!-- <a href="/admin/auth/group/add/" style="margin-left: 180px;"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i>Add</a> -->
+      </a>   
+    </li>
+    <li class="nav-item">
+      <a href="/admin/auth/user/" class="nav-link">
+        <i class="fa-solid fa-user"></i> &nbsp;
+        <p>Users</p>
+        <!-- <a href="/admin/auth/user/add/" style="margin-left: 180px;"><i class="fa fa-plus" aria-hidden="true" style="color: green;"></i>Add</a> -->
+      </a>
+    </li> 
+  </ul>
+</li>
+<li class="nav-item menu-open">
+  <a href="#" class="nav-link">
+    <i class="fa-solid fa-user-gear"></i> &nbsp;
+    <p>
+      Customer
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    <li class="nav-item">
+      <a href="/admin/Customer/customer/" class="nav-link">
+        <i class="fa-solid fa-user-plus"></i> &nbsp;
+        <p>Customers</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Customer/customer/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add </a>-->
+    </li>
+    <li class="nav-item">
+      <a href="/admin/Customer/customergroup/" class="nav-link">
+        <i class="fa-solid fa-user-group"></i> &nbsp;
+        <p>Customer Group</p></a>
+      <!-- </a><a style="margin-left: 20px; color: white;" href="/admin/Customer/customergroup/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add </a>--> 
+    </li>
+  </ul>
+</li>
+<li class="nav-item menu-open">
+  <a href="#" class="nav-link">
+    <i class="fa-solid fa-gear"></i> &nbsp;
+    <p>
+      CMS
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    <li class="nav-item">
+      <a href="/admin/Banner/banner/" class="nav-link">
+        <i class="fa-solid fa-image"></i> &nbsp;
+        <p>Banners</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Banner/banner/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a> -->
+    </li>
+    <li class="nav-item">
+      <a href="/admin/Banner/bannergroup/" class="nav-link">
+        <i class="fa-solid fa-images"></i> &nbsp;
+        <p>Banner Group</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Banner/bannergroup/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a> -->
+    </li>
+    <li class="nav-item">
+      <a href="/admin/Block/block/" class="nav-link">
+        <i class="fa-solid fa-square"></i> &nbsp;
+        <p>Blocks</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Block/block/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a> -->
+    </li>
+    <li class="nav-item">
+      <a href="/admin/Pages/pages/" class="nav-link">
+        <i class="fa-solid fa-book"></i> &nbsp;
+        <p>Pages</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Pages/pages/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a> -->  
+    </li> 
+  </ul>
+</li>
+<li class="nav-item menu-open">
+  <a href="#" class="nav-link">
+    <i class="fa-solid fa-gears"></i> &nbsp;
+    <p>
+      System
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview"> 
+    <li class="nav-item">
+      <a href="/admin/Attribute/attribute/" class="nav-link">
+        <i class="fa-solid fa-list-check"></i> &nbsp;
+        <p>Attributes</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Attribute/attribute/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add</a>   -->
+    </li> 
+    <li class="nav-item">
+      <a href="/admin/Language/language/" class="nav-link">
+        <i class="fa-solid fa-language"></i> &nbsp;
+        <p>Languages</p></a>
+        <!-- <a style="margin-left: 20px; color: white;" href="/admin/Languages/language/add/" class="badge badge-info right"><i class="fa fa-plus" aria-hidden="true"></i>  Add-->
+    </li>
+  </ul>
+</li>
 {% else %}
 <p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
 {% endif %}

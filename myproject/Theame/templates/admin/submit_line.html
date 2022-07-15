@@ -4,7 +4,7 @@
 {% if show_save %}<input type="submit" value="Save" class="btn btn-primary" name="_save">{% endif %}
 {% if show_delete_link and original %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}" class="btn btn-danger">{% translate "Delete" %}</a></p>
+    <a href="{% add_preserved_filters delete_url %}" class="btn btn-danger">{% translate "Delete" %}</a>
 {% endif %}
 {% if show_save_as_new %}<input type="submit" value="{% translate 'Save as new' %}" class="btn btn-primary" name="_saveasnew">{% endif %}
 {% if show_save_and_add_another %}<input type="submit" value="{% translate 'Save and add another' %}" class="btn btn-primary" name="_addanother">{% endif %}

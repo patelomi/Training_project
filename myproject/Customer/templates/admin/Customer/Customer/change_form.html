@@ -1,0 +1,1084 @@
+{% include "admin/base_site.html" %}
+{% load static %}
+
+{% load i18n admin_urls static admin_list %}
+{% block extrahead %}
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script>
+    // for img
+    $(function () { 
+        bsCustomFileInput.init();
+    });
+</script>
+<!-- formvalidation -->
+<script type="text/javascript">
+    $(function () { 
+        $('#quickForm').validate({
+            rules: {
+                fname: {
+                    required: true,
+                    minlength: 3,
+                },
+                lname: {
+                    required: true,
+                    minlength: 3,
+                },
+                email: {
+                    required: true,
+                    email: true,
+                },
+                phoneno: {
+                    required: true,
+                    minlength: 10,
+                    maxlength: 10,
+                },
+                password: {
+                    required: true,
+                    minlength: 8,
+                    maxlength: 8,
+                    pwcheck: true,
+                },
+                confirmpassword: {
+                    required: true,
+                    minlength: 8,
+                    maxlength: 8,
+                    equalTo: '#password',
+                },
+                password1: {
+                    // pwcheck: true,
+                },
+                confirmpassword1: {
+                    // equalTo: '#password1',
+                },
+                group: {
+                    required: true,
+                },
+                name: {
+                    required: true,
+                },
+                street: {
+                    required: true,
+                },
+                houseno: {
+                    required: true,
+                },
+                unitno: {
+                    required: true,
+                },
+                postalcode: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 6,
+                },
+                tag: {
+                    required: true,
+                },
+                // city: {
+                //     required: true,
+                // },
+                // state: {
+                //     required: true,
+                // },
+            },
+            messages: {
+                fname: {
+                    required: "Please Enter a First Name",
+                    minlength: "Your First Name must be at least 3 characters long",
+                },
+                lname: {
+                    required: "Please Enter a First Name",
+                    minlength: "Your First Name must be at least 3 characters long",
+                },
+                email: {
+                    required: "Please Enter a Email Address",
+                    email: "Please enter a valid Email Address"
+                },
+                phoneno: {
+                    required: "Please Enter a Phone Number",
+                    minlength: "Your Phone Number must be at least 10 Digits long",
+                    maxlength: "Your Phone Number must be 10 Digits long",
+                },
+                password: {
+                    required: "Please provide a Password",
+                    minlength: "Your Password must be at least 8 characters long",
+                    maxlength: "Your Password must be 8 characters long",
+                },
+                confirmpassword: {
+                    required: "Please provide a Confirm Password",
+                    minlength: "Your Confirm Password must be at least 8 characters long",
+                    maxlength: "Your Confirm Password must be 10 characters long",
+                },
+                group: {
+                    required: "Please provide a Group",
+                },
+                street: {
+                    required: "Please Enter a Street",
+                },
+                houseno: {
+                    required: "Please Enter a House No",
+                },
+                unitno: {
+                    required: "Please Enter a Unit No",
+                },
+                postalcode: {
+                    required: "Please Enter a Postal Code",
+                    minlength: "Your Postal Code must be at least 6 Digits long",
+                    maxlength: "Your Postal Code must be 6 Digits long",
+                },
+                tag: {
+                    required: "Please Enter a Tag",
+                },
+                name: {
+                    required: "Please Enter a Name",
+                },
+                // city: {
+                //     required: "Please Enter a City",
+                // },
+                // state: {
+                //     required: "Please Enter a State",
+                // },
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+        // password validition
+        $.validator.addMethod("pwcheck", function (value, element) {
+                    let password = value;
+                    if (!(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&])(.{8,20}$)/.test(password))) {
+                    return false;
+                    }
+                    return true;
+                    }, function (value, element) {
+                    let password = $(element).val();
+                    if (!(/^(.{8}$)/.test(password))) {
+                    return 'Password must be between 8 characters long.';
+                    }
+                    else if (!(/^(?=.*[A-Z])/.test(password))) {
+                    return 'Password must contain at least one Uppercase.';
+                    }
+                    else if (!(/^(?=.*[a-z])/.test(password))) {
+                    return 'Password must contain at least one Lowercase.';
+                    }
+                    else if (!(/^(?=.*[0-9])/.test(password))) {
+                    return 'Password must contain at least one digit.';
+                    }
+                    else if (!(/^(?=.*[@#$%&])/.test(password))) {
+                    return "Password must contain special characters from @#$%&.";
+                    }
+                    return false;
+                    });
+    });
+</script>
+
+{% endblock %}
+{% block content %}
+
+<body>
+    <!-- Add form for customer -->
+    {% if customerdata is None and addressdata is None %}
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Add Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            {% if not is_popup %}
+                            {% block breadcrumbs %}
+                            <div class="breadcrumbs">
+                                <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                                &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">
+                                    {{ opts.app_config.verbose_name }}</a>
+                                &rsaquo; {% if has_view_permission %}<a
+                                    href="{% url opts|admin_urlname:'changelist' %}">
+                                    {{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}
+                                {% endif %}
+                                &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{%endblocktranslate %}
+                                {% else %}{{ original|truncatewords:"18" }}{% endif %}
+                            </div>
+                            {% endblock %}
+                            {% endif %}
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <form id="quickForm" method="POST" name="quickForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- left column -->
+                        <div class="col-md-12">
+                            <!-- jquery validation -->
+                            <div class="row">
+                                <div class="card-body">
+
+
+                                    <div class="card card-primary card-outline card-outline-tabs">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="custom-tabs-four-home-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-home" role="tab"
+                                                        aria-controls="custom-tabs-four-home"
+                                                        aria-selected="true">Customer <i
+                                                            class="fa-solid fa-user-plus"></i></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="custom-tabs-four-profile-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-profile" role="tab"
+                                                        aria-controls="custom-tabs-four-profile"
+                                                        aria-selected="false">Address <i
+                                                            class="fa-solid fa-location-dot"></i></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                                <div class="tab-pane fade show active" id="custom-tabs-four-home"
+                                                    role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                                                    <div class="card-body">
+                                                        <!-- select -->
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputfname">First Name *</label>
+                                                                    <input type="text" name="fname" class="form-control"
+                                                                        id="fname" placeholder="Enter First Name">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputlname">Last Name *</label>
+                                                                    <input type="text" name="lname" class="form-control"
+                                                                        id="lname" placeholder="Enter Last Name">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleInputFile">Profile Picture</label>
+                                                            <div class="input-group">
+                                                                <div class="custom-file">
+                                                                    <input type="file" name="profileimg"
+                                                                        class="custom-file-input" id="profileimg"
+                                                                        multiple
+                                                                        accept="image/jpeg, image/png, image/jpg">
+                                                                    <label class="custom-file-label"
+                                                                        for="exampleInputFile">Choose
+                                                                        file</label>
+                                                                </div>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text"><i
+                                                                            class="fa-regular fa-file-image"></i></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="callout callout-warning">
+                                                            <strong>Note</strong>
+                                                            <li>Maximum size : 8 MB</li>
+                                                            <li>Allowed file type : jpeg, jpg, png</li>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputEmail1">Email *</label>
+                                                                    <input type="email" name="email"
+                                                                        class="form-control" id="email"
+                                                                        placeholder="Enter Email">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox" id="varification"
+                                                                        name="varification">
+                                                                    <label>Email Varification?</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleInputnumber">Contect Number *</label>
+                                                            <input type="number" name="phoneno" class="form-control"
+                                                                id="phoneno" placeholder="Enter Contact Number">
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputPassword1">Password
+                                                                        *</label>
+                                                                    <input type="password" name="password"
+                                                                        class="form-control" id="password"
+                                                                        placeholder="Enter Password">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputPassword1">Confirm Password
+                                                                        *</label>
+                                                                    <input type="password" name="confirmpassword"
+                                                                        class="form-control" id="confirmpassword"
+                                                                        placeholder="Enter Confirm Password">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Select Customer Group *</label>
+                                                            <select class="form-control" name="group" id="group">
+                                                                <option value="Select" selected disabled hidden>Select
+                                                                </option>
+                                                                {% for cg in customergroupdata %}
+                                                                <option value="{{ cg.id }}">{{ cg.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel"
+                                                    aria-labelledby="custom-tabs-four-profile-tab">
+                                                    <div class="card card-primary">
+                                                        <div class="card-body" id="optiontable">
+                                                            <button type="button" id="add" class="btn btn-success"
+                                                                style="margin-left:1000px; width: 50px;"><i
+                                                                    class="fa-solid fa-plus"></i></button>
+                                                            <div id="oprioncount[0]">
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label
+                                                                                for="exampleInputname">Name(Home/Office)
+                                                                                *</label>
+                                                                            <input type="text" name="option['0'][name]"
+                                                                                class="form-control name"
+                                                                                id="option['0'][name]"
+                                                                                placeholder="Enter Name(Home/Office)" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputstreet">Block /
+                                                                                Streetname
+                                                                                *</label>
+                                                                            <textarea name="option['0'][street]"
+                                                                                class="form-control street"
+                                                                                id="option['0'][street]" rows="3"
+                                                                                placeholder="Enter Block / Streetname" required></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputhouseno">Building /
+                                                                                House No
+                                                                                *</label>
+                                                                            <input type="text"
+                                                                                name="option['0'][houseno]"
+                                                                                class="form-control houseno"
+                                                                                id="option['0'][houseno]"
+                                                                                placeholder="Enter Building / House No" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">Unit No
+                                                                                *</label>
+                                                                            <input type="text"
+                                                                                name="option['0'][unitno]"
+                                                                                class="form-control unitno"
+                                                                                id="option['0'][unitno]"
+                                                                                placeholder="Enter Unit No" required>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputpostalcode">Postal
+                                                                                Code
+                                                                                *</label>
+                                                                            <input type="number"
+                                                                                name="option['0'][postalcode]"
+                                                                                class="form-control postalcode"
+                                                                                id="option['0'][postalcode]"
+                                                                                placeholder="Enter Postal Code" maxlength="6" minlength="6" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputtag">Tag *</label>
+                                                                            <input type="text" name="option['0'][tag]"
+                                                                                class="form-control tag"
+                                                                                id="option['0'][tag]"
+                                                                                placeholder="Enter Tag" required>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">State
+                                                                                *</label>
+                                                                            <select class="form-control state"
+                                                                                name="option['0'][state]"
+                                                                                id="option['0'][state]" required>
+                                                                                <option value="Select" selected disabled
+                                                                                    hidden>Select
+                                                                                </option>
+                                                                                {% for state in statedata %}
+                                                                                <option value="{{ state.stateid }}">
+                                                                                    {{ state.satatename }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputcity">City
+                                                                                *</label>
+                                                                            <select class="form-control city"
+                                                                                name="option['0'][city]"
+                                                                                id="option['0'][city]" required>
+                                                                                <option value="Select" selected disabled
+                                                                                    hidden>Select
+                                                                                </option>
+                                                                                {% for city in citydata %}
+                                                                                <option value="{{ city.cityid }}">
+                                                                                    {{ city.cityname }}</option>
+                                                                                {% endfor %}
+                                                                            </select>    
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox"
+                                                                        id="option['0'][isdefault]"
+                                                                        name="option['0'][isdefault]" class="isdefault">
+                                                                    <label>Is Default?</label>
+                                                                </div>
+                                                                <button type="button" class="delete btn btn-danger"><i
+                                                                        class="fa-solid fa-trash"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.card -->
+                                    </div>
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!--/.col (left) -->
+                        </div>
+                        <!-- /.row -->
+                    </div><!-- /.container-fluid -->
+            </section>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+            </div>
+        </form>
+    </div>
+    <!-- End add customer -->
+    <!-- update / edit customer -->
+    {% else %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Add Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            {% if not is_popup %}
+                            <div class="breadcrumbs">
+                                <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+                                &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">
+                                    {{ opts.app_config.verbose_name }}</a>
+                                &rsaquo; {% if has_view_permission %}<a
+                                    href="{% url opts|admin_urlname:'changelist' %}">
+                                    {{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+                                &rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}
+                                {% else %}{{ original|truncatewords:"18" }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- Main content -->
+        <form id="quickForm" method="POST" name="quickForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- left column -->
+                        <div class="col-md-12">
+                            <!-- jquery validation -->
+                            <div class="row">
+                                <div class="card-body">
+                                    <div class="card card-primary card-outline card-outline-tabs">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="custom-tabs-four-home-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-home" role="tab"
+                                                        aria-controls="custom-tabs-four-home"
+                                                        aria-selected="true">Customer <i
+                                                            class="fa-solid fa-user-plus"></i></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="custom-tabs-four-profile-tab"
+                                                        data-toggle="pill" href="#custom-tabs-four-profile" role="tab"
+                                                        aria-controls="custom-tabs-four-profile"
+                                                        aria-selected="false">Address <i
+                                                            class="fa-solid fa-location-dot"></i></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                                <div class="tab-pane fade show active" id="custom-tabs-four-home"
+                                                    role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+                                                    <div class="card-body">
+                                                        <!-- select -->
+                                                        {% for c in customerdata %}
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <input type="hidden" name="cid" class="form-control"
+                                                                    id="cid" value="{{ c.cid }}">
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputfname">First Name *</label>
+                                                                    <input type="text" name="fname" class="form-control"
+                                                                        id="fname" placeholder="Enter First Name"
+                                                                        value="{{ c.firstname }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputlname">Last Name *</label>
+                                                                    <input type="text" name="lname" class="form-control"
+                                                                        id="lname" placeholder="Enter Last Name"
+                                                                        value="{{ c.lastname }}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Your Profile Picture</label>
+                                                                    <div class="input-group">
+                                                                        {% if c.profileimg %}
+                                                                        <img src="{{ c.profileimg.url }}" alt="{{ c.profileimg }}" height="50px" width="50px" id="img">
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label>Profile Picture</label>
+                                                                    <div class="input-group">
+                                                                        <div class="custom-file">
+                                                                            <input type="file" name="profileimg"
+                                                                                class="custom-file-input" id="profileimg"
+                                                                                multiple
+                                                                                accept="image/jpeg, image/png, image/jpg" onchange="readURL(this)">
+                                                                            <label class="custom-file-label">{{ c.profileimg }}</label>
+                                                                        </div>
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fa-regular fa-file-image"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>    
+                                                        </div>    
+                                                        <div class="callout callout-warning">
+                                                            <strong>Note</strong>
+                                                            <li>Maximum size : 8 MB</li>
+                                                            <li>Allowed file type : jpeg, jpg, png</li>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputEmail1">Email *</label>
+                                                                    <input type="email" name="email"
+                                                                        class="form-control" id="email"
+                                                                        placeholder="Enter Email" value="{{ c.email }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                {% if c.emailvarifaction == "No" %}
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox" id="varification"
+                                                                        name="varification">
+                                                                    <label>Email Varification?</label>
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleInputnumber">Contect Number *</label>
+                                                            <input type="number" name="phoneno" class="form-control"
+                                                                id="phoneno" placeholder="Enter Contact Number"
+                                                                value="{{ c.phoneno }}">
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <!-- text input -->
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputPassword1">Password
+                                                                        *</label>
+                                                                    <input type="password" name="password1"
+                                                                        class="form-control" id="password"
+                                                                        placeholder="Enter Password">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-group">
+                                                                    <label for="exampleInputPassword1">Confirm Password
+                                                                        *</label>
+                                                                    <input type="password" name="confirmpassword1"
+                                                                        class="form-control" id="confirmpassword"
+                                                                        placeholder="Enter Confirm Password">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Select Customer Group *</label>
+                                                            <select class="form-control" name="group" id="group">
+                                                                <option value="Select" selected disabled hidden>Select
+                                                                </option>
+                                                                {% for cg in customergroupdata %}
+                                                                <option value="{{ cg.id }}" {% if cg.id == c.group.id %}
+                                                                    selected {% endif %}>{{ cg.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel"
+                                                    aria-labelledby="custom-tabs-four-profile-tab">
+                                                    <div class="card card-primary">
+                                                        <div class="card-body" id="optiontable">
+                                                            <button type="button" id="add" class="btn btn-success"
+                                                                style="margin-left:1000px; width: 50px;"><i
+                                                                    class="fa-solid fa-plus"></i></button>
+
+                                                            <div id="oprioncount[0]">
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <input type="hidden" name="option['0'][aid]"
+                                                                                class="form-control"
+                                                                                id="addressid">
+                                                                            <input type="hidden" name="option['0'][customer]"
+                                                                                class="form-control"
+                                                                                id="customer">
+                                                                            <label
+                                                                                for="exampleInputname">Name(Home/Office)
+                                                                                *</label>
+                                                                            <input type="text" name="option['0'][name]"
+                                                                                class="form-control"
+                                                                                id="name"
+                                                                                placeholder="Enter Name(Home/Office)">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputstreet">Block /
+                                                                                Streetname
+                                                                                *</label>
+                                                                            <textarea name="option['0'][street]"
+                                                                                class="form-control"
+                                                                                id="street" rows="3"
+                                                                                placeholder="Enter Block / Streetname"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputhouseno">Building /
+                                                                                House No
+                                                                                *</label>
+                                                                            <input type="text"
+                                                                                name="option['0'][houseno]"
+                                                                                class="form-control"
+                                                                                id="houseno"
+                                                                                placeholder="Enter Building / House No">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">Unit No
+                                                                                *</label>
+                                                                            <input type="text"
+                                                                                name="option['0'][unitno]"
+                                                                                class="form-control"
+                                                                                id="unitno"
+                                                                                placeholder="Enter Unit No">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputpostalcode">Postal
+                                                                                Code
+                                                                                *</label>
+                                                                            <input type="number"
+                                                                                name="option['0'][postalcode]"
+                                                                                class="form-control"
+                                                                                id="postalcode"
+                                                                                placeholder="Enter Postal Code">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputtag">Tag *</label>
+                                                                            <input type="text" name="option['0'][tag]"
+                                                                                class="form-control"
+                                                                                id="tag"
+                                                                                placeholder="Enter Tag">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">State
+                                                                                *</label>
+                                                                            <select class="form-control"
+                                                                                name="option['0'][state]"
+                                                                                id="state">
+                                                                                <option value="" >Select
+                                                                                </option>
+                                                                                {% for state in statedata %}
+                                                                                <option value="{{ state.stateid }}">
+                                                                                    {{ state.satatename }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputcity">City
+                                                                                *</label>
+                                                                            <select class="form-control"
+                                                                                name="option['0'][city]"
+                                                                                id="city">
+                                                                                <option value="" >Select
+                                                                                </option>
+                                                                                {% for city in citydata %}
+                                                                                <option value="{{ city.cityid }}">
+                                                                                    {{ city.cityname }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox"
+                                                                        id="isdefault"
+                                                                        name="option['0'][isdefault]">
+                                                                    <label>Is Default?</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        {% for a in addressdata %}
+                                                        <div class="col-md-4" id="{{ a.aid }}">
+                                                            <a href="" style="color: black;" class="edit">
+                                                                <div class="card card-outline card-primary" id="{{ a.aid }}">
+                                                                    <div id="oprioncount[{{forloop.counter0}}]">
+                                                                        </p>
+                                                                        <div class="card-body">
+                                                                            <h5><strong>{{ a.name }} {% if a.isdefault == "Yes" %}<i class="fa-solid fa-check" style="color: green; margin-left: 200px;">{% endif %}</i></strong></h5>
+                                                                            <hr>
+                                                                            <p>
+                                                                                {{ a.houseno }}, {{ a.streetname }}, <br>
+                                                                                {{ a.unitno }}, {{ a.tag }},
+                                                                                <br>
+                                                                                {{ a.city }}, {{ a.state }}, <br>
+                                                                                {{ a.postalcode }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                            </a>
+                                                                    <button type="button" class="delete btn btn-danger"><i
+                                                                            class="fa-solid fa-trash"></i></button>
+                                                                </div>
+                                                        </div>
+                                                        {% endfor %} 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!--/.col (left) -->
+                </div>
+                <!-- /.row -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Update Customer</button>
+                </div>
+            </section>
+        </form>
+    </div>
+    {% endif %}
+    <!-- End update / edit customer -->
+
+    <!-- add address -->
+    <script type="text/javascript">
+        var count = $('[id^=oprioncount]').length - 1;
+        $("#add").click(function () {
+            count= 1;
+            if (count < 9) {
+                var html = `<div id="oprioncount[${count}]">
+                   <hr>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label
+                                                                                for="exampleInputname">Name(Home/Office)
+                                                                                *</label>
+                                                                            <input type="text" name="option['${count}'][name]"
+                                                                                class="form-control" id="option['${count}'][name]"
+                                                                                placeholder="Enter Name(Home/Office)">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputstreet">Block /
+                                                                                Streetname
+                                                                                *</label>
+                                                                            <textarea name="option['${count}'][street]" class="form-control"
+                                                                                id="option['${count}'][street]" rows="3"
+                                                                                placeholder="Enter Block / Streetname"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputhouseno">Building /
+                                                                                House No
+                                                                                *</label>
+                                                                            <input type="text" name="option['${count}'][houseno]"
+                                                                                class="form-control" id="option['${count}'][houseno]"
+                                                                                placeholder="Enter Building / House No">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">Unit No
+                                                                                *</label>
+                                                                            <input type="text" name="option['${count}'][unitno]"
+                                                                                class="form-control" id="option['${count}'][unitno]"
+                                                                                placeholder="Enter Unit No">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputpostalcode">Postal
+                                                                                Code
+                                                                                *</label>
+                                                                            <input type="number" name="option['${count}'][postalcode]"
+                                                                                class="form-control" id="option['${count}'][postalcode]"
+                                                                                placeholder="Enter Postal Code">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputtag">Tag *</label>
+                                                                            <input type="text" name="option['${count}'][tag]"
+                                                                                class="form-control" id="option['${count}'][tag]"
+                                                                                placeholder="Enter Tag">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputunitno">State
+                                                                                *</label>
+                                                                            <select class="form-control" name="option['${count}'][state]"
+                                                                                id="option['${count}'][state]">
+                                                                                <option value="" >Select
+                                                                                </option>
+                                                                                {% for state in statedata %}
+                                                                                <option value="{{ state.stateid }}">{{ state.satatename }}</option>
+                                                                                {% endfor %}
+                                                                            </select> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="form-group">
+                                                                            <label for="exampleInputcity">City
+                                                                                *</label>
+                                                                            <select class="form-control" name="option['${count}'][city]"
+                                                                                id="option['${count}'][city]">
+                                                                                <option value="" >Select
+                                                                                </option>
+                                                                                {% for city in citydata %}
+                                                                                <option value="{{ city.cityid }}">{{ city.cityname }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group my-4">
+                                                                    <input type="checkbox" id="option['${count}'][isdefault]"
+                                                                        name="option['${count}'][isdefault]">
+                                                                    <label>Is Default?</label>
+                                                                </div>
+                                                                
+                                                                <button type="button" class="delete btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                                                
+                                                                </hr>
+                                                          
+                    </div>
+                                                        `;
+                $("#optiontable").append(html);
+            }
+            $(".delete").click(function () {
+                $(event.target).closest("div").remove();
+            });
+
+            $(".radio").change(function () {
+                $(".radio").not(this).prop('checked', false);
+            });
+        });
+        // end addaddress
+
+        // delete address 
+        $('.delete').click(function (e) {
+            e.preventDefault();
+
+            var id = $(this).parent("div").attr("id");
+            // console.log(id);
+            if (confirm('Are you sure you want to Delete?')) {
+            $.ajax({
+                url: "/delete?id=" + id + "/",
+                type: 'GET',
+                success: function (response) {
+                $("#" + id).remove();
+                alert("Delete successfully.");
+
+                },
+                error: function () {
+                alert('Something is wrong, couldn\'t delete record');
+                },
+
+                cache: false,
+                contentType: false,
+                processData: false,
+
+            });
+            }
+        });
+        // end delete address 
+
+        // edint address 
+        $('.edit').click(function (e) {
+            e.preventDefault();
+
+            var id = $(this).parent("div").attr("id");
+            // console.log(id);
+            
+            $.ajax({
+                url: "/edit?id=" + id + "/",
+                type: 'GET',
+                success: function (response) {
+                // alert(response[0]);
+                var instance = JSON.parse(response["senddata"]);
+                var aid = JSON.parse(response["aid"]);
+                var fields = instance[0]["fields"];
+                addressid = {aid:aid}
+                console.log(fields)
+                $('#addressid').val(aid)
+                $('#customer').val(fields.customer)
+                $('#name').val(fields.name)
+                $('#street').val(fields.streetname)
+                $('#houseno').val(fields.houseno)
+                $('#unitno').val(fields.unitno)
+                $('#postalcode').val(fields.postalcode)
+                $('#tag').val(fields.tag)
+                $('#city').val(fields.city)
+                $('#state').val(fields.state)
+                // $('#isdefault').val(fields.isdefault)
+                if(fields.isdefault == "Yes"){
+                    document.getElementById("isdefault").checked = true;
+                }
+                else{
+                    document.getElementById("isdefault").checked = false;
+                }
+                },
+                error: function () {
+                alert('Something is wrong!!');
+                },
+
+                cache: false,
+                contentType: false,
+                processData: false,
+
+            });
+        });
+    </script>
+    <!-- end edit address  -->
+
+    <!-- for img change  -->
+    <script>
+        function readURL(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      $('#img').attr('src', e.target.result).width(50).height(50);
+      };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+    </script>
+    <script>
+        
+    </script>
+</body>
+
+{% endblock %}

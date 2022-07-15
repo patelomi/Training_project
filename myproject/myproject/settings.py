@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'Pages',
     'Attribute',
     'Theame',
+    'Customer',
+    'Block',
+    'Banner',
+    'Configration',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +136,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_DIRS = [
     # os.path.join(BASE_DIR,'static'),
@@ -146,3 +152,10 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#emailsend
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'patelomvi@gmail.com'
+EMAIL_HOST_PASSWORD = 'fgfphiempghgturo'
+EMAIL_USE_TLS = True
